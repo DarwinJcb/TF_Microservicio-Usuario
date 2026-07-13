@@ -1,0 +1,141 @@
+/**
+ * prisma/schema.prisma:
+ */
+generator client {
+    provider     = "prisma-client"
+    output       = "../src/generated/prisma"
+    moduleFormat = "cjs"
+}
+
+datasource db {
+    provider = "postgresql"
+}
+
+// ENUMERACIONES
+
+enum Genero {
+    MASCULINO
+    FEMENINO
+}
+
+enum SignoZodiacal {
+    ARIES
+    TAURO
+    GEMINIS
+    CANCER
+    LEO
+    VIRGO
+    LIBRA
+    ESCORPIO
+    SAGITARIO
+    CAPRICORNIO
+    ACUARIO
+    PISCIS
+}
+
+enum EstadoActividad {
+    ONLINE
+    DESCONECTADO
+}
+
+enum EstadoTransmision {
+    LIVE
+    FINALIZADA
+}
+
+// USUARIOS
+
+model Usuario {
+    IdUsuario           Int             @id @default(autoincrement())
+    nombre              String
+    edad                Int
+    biografia           String?
+    peso                Float?
+    altura              Float?
+    nacionalidad        String
+    genero              Genero
+    ciudad              String
+    pais                String
+    numeroTelefono      String          @unique
+    correo              String          @unique
+    contrasenaHash      String?
+    estadoActividad     EstadoActividad @default(DESCONECTADO)
+    interes             Interes?
+    fotos               Foto[]
+    ubicaciones         Ubicacion[]
+    musicas             Musica[]
+    transmisiones       Transmision[]
+    donacionesEnviadas  Donacion[]      @relation("DonacionesEnviadas")
+    donacionesRecibidas Donacion[]      @relation("DonacionesRecibidas")
+}
+
+// DATOS DE INTERES
+
+model Interes {
+    IdInteres     Int            @id @default(autoincrement())
+    signoZodiacal SignoZodiacal?
+    queBusca      String?
+    ubicacion     String?
+    ciudad        String?
+    pais          String?
+    hobby         String?
+    dedicacion    String?
+    UsuarioFK     Int            @unique
+    usuario       Usuario        @relation(fields: [UsuarioFK], references: [IdUsuario])
+}
+
+// FOTOS
+
+model Foto {
+    IdFoto    Int     @id @default(autoincrement())
+    urlFoto   String
+    UsuarioFK Int
+    usuario   Usuario @relation(fields: [UsuarioFK], references: [IdUsuario])
+}
+
+// UBICACIONES
+
+model Ubicacion {
+    IdUbicacion Int     @id @default(autoincrement())
+    ubicacion   String?
+    ciudad      String
+    pais        String
+    UsuarioFK   Int
+    usuario     Usuario @relation(fields: [UsuarioFK], references: [IdUsuario])
+}
+
+// MUSICA
+
+model Musica {
+    IdMusica      Int     @id @default(autoincrement())
+    nombreCancion String?
+    tipoMusica    String?
+    UsuarioFK     Int
+    usuario       Usuario @relation(fields: [UsuarioFK], references: [IdUsuario])
+}
+
+// TRANSMISIONES LIVE
+
+model Transmision {
+    IdTransmision Int               @id @default(autoincrement())
+    estado        EstadoTransmision @default(LIVE)
+    fechaInicio   DateTime          @default(now())
+    fechaFin      DateTime?
+    UsuarioFK     Int
+    usuario       Usuario           @relation(fields: [UsuarioFK], references: [IdUsuario])
+    donaciones    Donacion[]
+}
+
+// DONACIONES
+
+model Donacion {
+    IdDonacion        Int          @id @default(autoincrement())
+    monto             Decimal      @db.Decimal(10, 2)
+    fechaDonacion     DateTime     @default(now())
+    UsuarioDonanteFK  Int
+    UsuarioReceptorFK Int
+    TransmisionFK     Int?
+    usuarioDonante    Usuario      @relation("DonacionesEnviadas", fields: [UsuarioDonanteFK], references: [IdUsuario])
+    usuarioReceptor   Usuario      @relation("DonacionesRecibidas", fields: [UsuarioReceptorFK], references: [IdUsuario])
+    transmision       Transmision? @relation(fields: [TransmisionFK], references: [IdTransmision])
+}
