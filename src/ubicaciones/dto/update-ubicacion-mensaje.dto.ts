@@ -1,3 +1,4 @@
+/* src/ubicaciones/dto/update-ubicacion-mensaje.dto.ts: */
 import { IsInt, Min } from 'class-validator';
 import { UpdateUbicacionDto } from './update-ubicacion.dto';
 

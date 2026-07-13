@@ -7,7 +7,7 @@ import { UpdateUbicacionMensajeDto } from './dto/update-ubicacion-mensaje.dto';
 
 @Injectable()
 export class UbicacionesService {
-  constructor(private readonly prisma: PrismaService) { }
+  constructor(private readonly prisma: PrismaService) {}
 
   async create(createUbicacionDto: CreateUbicacionDto) {
     await this.verificarUsuario(createUbicacionDto.UsuarioFK);
@@ -49,18 +49,13 @@ export class UbicacionesService {
     return ubicacion;
   }
 
-  async update(
-    updateUbicacionDto: UpdateUbicacionMensajeDto,
-  ) {
-    const { IdUbicacion, ...datosUbicacion } =
-      updateUbicacionDto;
+  async update(updateUbicacionDto: UpdateUbicacionMensajeDto) {
+    const { IdUbicacion, ...datosUbicacion } = updateUbicacionDto;
 
     await this.findOne(IdUbicacion);
 
     if (datosUbicacion.UsuarioFK !== undefined) {
-      await this.verificarUsuario(
-        datosUbicacion.UsuarioFK,
-      );
+      await this.verificarUsuario(datosUbicacion.UsuarioFK);
     }
 
     return this.prisma.ubicacion.update({
@@ -81,9 +76,7 @@ export class UbicacionesService {
     });
   }
 
-  private async verificarUsuario(
-    IdUsuario: number,
-  ): Promise<void> {
+  private async verificarUsuario(IdUsuario: number): Promise<void> {
     const usuario = await this.prisma.usuario.findUnique({
       where: {
         IdUsuario,

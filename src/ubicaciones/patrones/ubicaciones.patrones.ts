@@ -1,3 +1,4 @@
+/* src/ubicaciones/patrones/ubicaciones.patrones.ts: */
 export const PATRONES_UBICACIONES = {
   CREAR: 'ubicaciones.crear',
   LISTAR: 'ubicaciones.listar',
