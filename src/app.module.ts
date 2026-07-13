@@ -3,9 +3,9 @@ import { Module } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
 import { FotosModule } from './fotos/fotos.module';
 import { InteresesModule } from './intereses/intereses.module';
+import { MusicasModule } from './musicas/musicas.module';
 import { UbicacionesModule } from './ubicaciones/ubicaciones.module';
 import { UsuariosModule } from './usuarios/usuarios.module';
-import { MusicasModule } from './musicas/musicas.module';
 
 @Module({
   imports: [
@@ -19,4 +19,4 @@ import { MusicasModule } from './musicas/musicas.module';
     MusicasModule,
   ],
 })
-export class AppModule {}
+export class AppModule { }
