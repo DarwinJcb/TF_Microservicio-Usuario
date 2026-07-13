@@ -8,9 +8,7 @@ import {
 } from '@nestjs/microservices';
 import { AppModule } from './app.module';
 
-function obtenerHostMicroservicio(
-  configService: ConfigService,
-): string {
+function obtenerHostMicroservicio(configService: ConfigService): string {
   const host = configService.get<string>('HOST_MICROSERVICIO');
 
   if (!host) {
@@ -22,12 +20,8 @@ function obtenerHostMicroservicio(
   return host;
 }
 
-function obtenerPuertoMicroservicio(
-  configService: ConfigService,
-): number {
-  const puertoTexto = configService.get<string>(
-    'PUERTO_MICROSERVICIO',
-  );
+function obtenerPuertoMicroservicio(configService: ConfigService): number {
+  const puertoTexto = configService.get<string>('PUERTO_MICROSERVICIO');
 
   if (!puertoTexto) {
     throw new Error(
@@ -37,11 +31,7 @@ function obtenerPuertoMicroservicio(
 
   const puerto = Number(puertoTexto);
 
-  if (
-    !Number.isInteger(puerto) ||
-    puerto < 1 ||
-    puerto > 65535
-  ) {
+  if (!Number.isInteger(puerto) || puerto < 1 || puerto > 65535) {
     throw new Error(
       'La variable PUERTO_MICROSERVICIO debe contener un puerto válido.',
     );
@@ -52,21 +42,16 @@ function obtenerPuertoMicroservicio(
 
 async function bootstrap(): Promise<void> {
   const aplicacion =
-    await NestFactory.createMicroservice<AsyncMicroserviceOptions>(
-      AppModule,
-      {
-        inject: [ConfigService],
-        useFactory: (
-          configService: ConfigService,
-        ): MicroserviceOptions => ({
-          transport: Transport.TCP,
-          options: {
-            host: obtenerHostMicroservicio(configService),
-            port: obtenerPuertoMicroservicio(configService),
-          },
-        }),
-      },
-    );
+    await NestFactory.createMicroservice<AsyncMicroserviceOptions>(AppModule, {
+      inject: [ConfigService],
+      useFactory: (configService: ConfigService): MicroserviceOptions => ({
+        transport: Transport.TCP,
+        options: {
+          host: obtenerHostMicroservicio(configService),
+          port: obtenerPuertoMicroservicio(configService),
+        },
+      }),
+    });
 
   aplicacion.enableShutdownHooks();
 
@@ -74,10 +59,7 @@ async function bootstrap(): Promise<void> {
 }
 
 bootstrap().catch((error: unknown) => {
-  console.error(
-    'No se pudo iniciar el microservicio de usuarios.',
-    error,
-  );
+  console.error('No se pudo iniciar el microservicio de usuarios.', error);
 
   process.exit(1);
 });
