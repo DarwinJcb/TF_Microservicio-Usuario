@@ -13,4 +13,4 @@ import { InteresesModule } from './intereses/intereses.module';
     InteresesModule,
   ],
 })
-export class AppModule {}
+export class AppModule { }

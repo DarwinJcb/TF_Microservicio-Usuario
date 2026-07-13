@@ -4,7 +4,7 @@ import { InteresesService } from './intereses.service';
 import { InteresesController } from './intereses.controller';
 
 @Module({
-    providers: [InteresesService],
-    controllers: [InteresesController]
+  controllers: [InteresesController],
+  providers: [InteresesService],
 })
 export class InteresesModule { }
