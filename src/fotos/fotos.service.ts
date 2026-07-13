@@ -1,27 +1,99 @@
 /* src/fotos/fotos.service.ts: */
-import { Injectable } from '@nestjs/common';
+import { HttpStatus, Injectable } from '@nestjs/common';
+import { RpcException } from '@nestjs/microservices';
+import { PrismaService } from '../prisma/prisma.service';
 import { CreateFotoDto } from './dto/create-foto.dto';
-import { UpdateFotoDto } from './dto/update-foto.dto';
+import { UpdateFotoMensajeDto } from './dto/update-foto-mensaje.dto';
 
 @Injectable()
 export class FotosService {
-  create(createFotoDto: CreateFotoDto) {
-    return 'This action adds a new foto';
+  constructor(private readonly prisma: PrismaService) {}
+
+  async create(createFotoDto: CreateFotoDto) {
+    await this.verificarUsuario(createFotoDto.UsuarioFK);
+
+    return this.prisma.foto.create({
+      data: createFotoDto,
+    });
   }
 
   findAll() {
-    return `This action returns all fotos`;
+    return this.prisma.foto.findMany();
   }
 
-  findOne(id: number) {
-    return `This action returns a #${id} foto`;
+  async findByUsuario(IdUsuario: number) {
+    await this.verificarUsuario(IdUsuario);
+
+    return this.prisma.foto.findMany({
+      where: {
+        UsuarioFK: IdUsuario,
+      },
+    });
   }
 
-  update(id: number, updateFotoDto: UpdateFotoDto) {
-    return `This action updates a #${id} foto`;
+  async findOne(IdFoto: number) {
+    const foto = await this.prisma.foto.findUnique({
+      where: {
+        IdFoto,
+      },
+    });
+
+    if (!foto) {
+      throw new RpcException({
+        statusCode: HttpStatus.NOT_FOUND,
+        message: `No existe una foto con el ID ${IdFoto}.`,
+        error: 'Not Found',
+      });
+    }
+
+    return foto;
   }
 
-  remove(id: number) {
-    return `This action removes a #${id} foto`;
+  async update(updateFotoDto: UpdateFotoMensajeDto) {
+    const { IdFoto, ...datosFoto } = updateFotoDto;
+
+    await this.findOne(IdFoto);
+
+    if (datosFoto.UsuarioFK !== undefined) {
+      await this.verificarUsuario(datosFoto.UsuarioFK);
+    }
+
+    return this.prisma.foto.update({
+      where: {
+        IdFoto,
+      },
+      data: datosFoto,
+    });
+  }
+
+  async remove(IdFoto: number) {
+    await this.findOne(IdFoto);
+
+    return this.prisma.foto.delete({
+      where: {
+        IdFoto,
+      },
+    });
+  }
+
+  private async verificarUsuario(
+    IdUsuario: number,
+  ): Promise<void> {
+    const usuario = await this.prisma.usuario.findUnique({
+      where: {
+        IdUsuario,
+      },
+      select: {
+        IdUsuario: true,
+      },
+    });
+
+    if (!usuario) {
+      throw new RpcException({
+        statusCode: HttpStatus.NOT_FOUND,
+        message: `No existe un usuario con el ID ${IdUsuario}.`,
+        error: 'Not Found',
+      });
+    }
   }
 }

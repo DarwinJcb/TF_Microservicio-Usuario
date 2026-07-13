@@ -1,2 +1,17 @@
 /* src/fotos/dto/create-foto.dto.ts: */
-export class CreateFotoDto { }
+import {
+    IsInt,
+    IsNotEmpty,
+    IsString,
+    Min,
+} from 'class-validator';
+
+export class CreateFotoDto {
+    @IsString()
+    @IsNotEmpty()
+    urlFoto: string;
+
+    @IsInt()
+    @Min(1)
+    UsuarioFK: number;
+}
