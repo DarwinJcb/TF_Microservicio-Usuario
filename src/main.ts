@@ -1,8 +1,5 @@
 /* src/main.ts: */
-import {
-  HttpStatus,
-  ValidationPipe,
-} from '@nestjs/common';
+import { HttpStatus, ValidationPipe } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { NestFactory } from '@nestjs/core';
 import {
@@ -14,12 +11,8 @@ import {
 import { ValidationError } from 'class-validator';
 import { AppModule } from './app.module';
 
-function obtenerHostMicroservicio(
-  configService: ConfigService,
-): string {
-  const host = configService.get<string>(
-    'HOST_MICROSERVICIO',
-  );
+function obtenerHostMicroservicio(configService: ConfigService): string {
+  const host = configService.get<string>('HOST_MICROSERVICIO');
 
   if (!host) {
     throw new Error(
@@ -30,12 +23,8 @@ function obtenerHostMicroservicio(
   return host;
 }
 
-function obtenerPuertoMicroservicio(
-  configService: ConfigService,
-): number {
-  const puertoTexto = configService.get<string>(
-    'PUERTO_MICROSERVICIO',
-  );
+function obtenerPuertoMicroservicio(configService: ConfigService): number {
+  const puertoTexto = configService.get<string>('PUERTO_MICROSERVICIO');
 
   if (!puertoTexto) {
     throw new Error(
@@ -45,11 +34,7 @@ function obtenerPuertoMicroservicio(
 
   const puerto = Number(puertoTexto);
 
-  if (
-    !Number.isInteger(puerto) ||
-    puerto < 1 ||
-    puerto > 65535
-  ) {
+  if (!Number.isInteger(puerto) || puerto < 1 || puerto > 65535) {
     throw new Error(
       'La variable PUERTO_MICROSERVICIO debe contener un puerto válido.',
     );
@@ -58,40 +43,29 @@ function obtenerPuertoMicroservicio(
   return puerto;
 }
 
-function obtenerMensajesValidacion(
-  errores: ValidationError[],
-): string[] {
-  return errores.flatMap((error) =>
-    Object.values(error.constraints ?? {}),
-  );
+function obtenerMensajesValidacion(errores: ValidationError[]): string[] {
+  return errores.flatMap((error) => Object.values(error.constraints ?? {}));
 }
 
 async function bootstrap(): Promise<void> {
   const aplicacion =
-    await NestFactory.createMicroservice<AsyncMicroserviceOptions>(
-      AppModule,
-      {
-        inject: [ConfigService],
-        useFactory: (
-          configService: ConfigService,
-        ): MicroserviceOptions => ({
-          transport: Transport.TCP,
-          options: {
-            host: obtenerHostMicroservicio(configService),
-            port: obtenerPuertoMicroservicio(configService),
-          },
-        }),
-      },
-    );
+    await NestFactory.createMicroservice<AsyncMicroserviceOptions>(AppModule, {
+      inject: [ConfigService],
+      useFactory: (configService: ConfigService): MicroserviceOptions => ({
+        transport: Transport.TCP,
+        options: {
+          host: obtenerHostMicroservicio(configService),
+          port: obtenerPuertoMicroservicio(configService),
+        },
+      }),
+    });
 
   aplicacion.useGlobalPipes(
     new ValidationPipe({
       whitelist: true,
       forbidNonWhitelisted: true,
       transform: true,
-      exceptionFactory: (
-        errores: ValidationError[],
-      ): RpcException =>
+      exceptionFactory: (errores: ValidationError[]): RpcException =>
         new RpcException({
           statusCode: HttpStatus.BAD_REQUEST,
           message: obtenerMensajesValidacion(errores),
@@ -106,10 +80,7 @@ async function bootstrap(): Promise<void> {
 }
 
 bootstrap().catch((error: unknown) => {
-  console.error(
-    'No se pudo iniciar el microservicio de usuarios.',
-    error,
-  );
+  console.error('No se pudo iniciar el microservicio de usuarios.', error);
 
   process.exit(1);
 });

@@ -7,20 +7,19 @@ import { UpdateInteresMensajeDto } from './dto/update-interes-mensaje.dto';
 
 @Injectable()
 export class InteresesService {
-  constructor(private readonly prisma: PrismaService) { }
+  constructor(private readonly prisma: PrismaService) {}
 
   async create(createInteresDto: CreateInteresDto) {
     await this.verificarUsuario(createInteresDto.UsuarioFK);
 
-    const interesExistente =
-      await this.prisma.interes.findUnique({
-        where: {
-          UsuarioFK: createInteresDto.UsuarioFK,
-        },
-        select: {
-          IdInteres: true,
-        },
-      });
+    const interesExistente = await this.prisma.interes.findUnique({
+      where: {
+        UsuarioFK: createInteresDto.UsuarioFK,
+      },
+      select: {
+        IdInteres: true,
+      },
+    });
 
     if (interesExistente) {
       throw new RpcException({
@@ -77,31 +76,24 @@ export class InteresesService {
     return interes;
   }
 
-  async update(
-    updateInteresDto: UpdateInteresMensajeDto,
-  ) {
-    const { IdInteres, ...datosInteres } =
-      updateInteresDto;
+  async update(updateInteresDto: UpdateInteresMensajeDto) {
+    const { IdInteres, ...datosInteres } = updateInteresDto;
 
     await this.findOne(IdInteres);
 
     if (datosInteres.UsuarioFK !== undefined) {
       await this.verificarUsuario(datosInteres.UsuarioFK);
 
-      const interesDelUsuario =
-        await this.prisma.interes.findUnique({
-          where: {
-            UsuarioFK: datosInteres.UsuarioFK,
-          },
-          select: {
-            IdInteres: true,
-          },
-        });
+      const interesDelUsuario = await this.prisma.interes.findUnique({
+        where: {
+          UsuarioFK: datosInteres.UsuarioFK,
+        },
+        select: {
+          IdInteres: true,
+        },
+      });
 
-      if (
-        interesDelUsuario &&
-        interesDelUsuario.IdInteres !== IdInteres
-      ) {
+      if (interesDelUsuario && interesDelUsuario.IdInteres !== IdInteres) {
         throw new RpcException({
           statusCode: HttpStatus.CONFLICT,
           message: `El usuario con el ID ${datosInteres.UsuarioFK} ya tiene intereses registrados.`,
@@ -128,9 +120,7 @@ export class InteresesService {
     });
   }
 
-  private async verificarUsuario(
-    IdUsuario: number,
-  ): Promise<void> {
+  private async verificarUsuario(IdUsuario: number): Promise<void> {
     const usuario = await this.prisma.usuario.findUnique({
       where: {
         IdUsuario,

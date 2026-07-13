@@ -3,6 +3,7 @@ import { Module } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
 import { InteresesModule } from './intereses/intereses.module';
 import { UsuariosModule } from './usuarios/usuarios.module';
+import { FotosModule } from './fotos/fotos.module';
 
 @Module({
   imports: [
@@ -11,6 +12,7 @@ import { UsuariosModule } from './usuarios/usuarios.module';
     }),
     UsuariosModule,
     InteresesModule,
+    FotosModule,
   ],
 })
-export class AppModule { }
+export class AppModule {}

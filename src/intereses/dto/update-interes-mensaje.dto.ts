@@ -3,7 +3,7 @@ import { IsInt, Min } from 'class-validator';
 import { UpdateInteresDto } from './update-interes.dto';
 
 export class UpdateInteresMensajeDto extends UpdateInteresDto {
-    @IsInt()
-    @Min(1)
-    IdInteres: number;
+  @IsInt()
+  @Min(1)
+  IdInteres: number;
 }

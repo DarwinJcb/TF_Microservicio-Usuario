@@ -9,4 +9,4 @@ import { InteresesService } from './intereses.service';
   controllers: [InteresesController],
   providers: [InteresesService],
 })
-export class InteresesModule { }
+export class InteresesModule {}
