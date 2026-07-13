@@ -2,7 +2,7 @@
 import { IsInt, Min } from 'class-validator';
 
 export class IdUsuarioDto {
-    @IsInt()
-    @Min(1)
-    IdUsuario: number;
+  @IsInt()
+  @Min(1)
+  IdUsuario: number;
 }
