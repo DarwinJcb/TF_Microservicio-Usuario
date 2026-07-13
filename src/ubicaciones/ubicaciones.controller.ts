@@ -1,34 +1,72 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
-import { UbicacionesService } from './ubicaciones.service';
+/* src/ubicaciones/ubicaciones.controller.ts: */
+import { Controller } from '@nestjs/common';
+import {
+  MessagePattern,
+  Payload,
+} from '@nestjs/microservices';
+import { IdUsuarioDto } from '../usuarios/dto/id-usuario.dto';
 import { CreateUbicacionDto } from './dto/create-ubicacion.dto';
-import { UpdateUbicacionDto } from './dto/update-ubicacion.dto';
+import { IdUbicacionDto } from './dto/id-ubicacion.dto';
+import { UpdateUbicacionMensajeDto } from './dto/update-ubicacion-mensaje.dto';
+import { PATRONES_UBICACIONES } from './patrones/ubicaciones.patrones';
+import { UbicacionesService } from './ubicaciones.service';
 
-@Controller('ubicaciones')
+@Controller()
 export class UbicacionesController {
-  constructor(private readonly ubicacionesService: UbicacionesService) {}
+  constructor(
+    private readonly ubicacionesService: UbicacionesService,
+  ) { }
 
-  @Post()
-  create(@Body() createUbicacioneDto: CreateUbicacionDto) {
-    return this.ubicacionesService.create(createUbicacioneDto);
+  @MessagePattern(PATRONES_UBICACIONES.CREAR)
+  create(
+    @Payload() createUbicacionDto: CreateUbicacionDto,
+  ) {
+    return this.ubicacionesService.create(
+      createUbicacionDto,
+    );
   }
 
-  @Get()
+  @MessagePattern(PATRONES_UBICACIONES.LISTAR)
   findAll() {
     return this.ubicacionesService.findAll();
   }
 
-  @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.ubicacionesService.findOne(+id);
+  @MessagePattern(
+    PATRONES_UBICACIONES.BUSCAR_POR_USUARIO,
+  )
+  findByUsuario(
+    @Payload() idUsuarioDto: IdUsuarioDto,
+  ) {
+    return this.ubicacionesService.findByUsuario(
+      idUsuarioDto.IdUsuario,
+    );
   }
 
-  @Patch(':id')
-  update(@Param('id') id: string, @Body() updateUbicacioneDto: UpdateUbicacionDto) {
-    return this.ubicacionesService.update(+id, updateUbicacioneDto);
+  @MessagePattern(PATRONES_UBICACIONES.BUSCAR)
+  findOne(
+    @Payload() idUbicacionDto: IdUbicacionDto,
+  ) {
+    return this.ubicacionesService.findOne(
+      idUbicacionDto.IdUbicacion,
+    );
   }
 
-  @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this.ubicacionesService.remove(+id);
+  @MessagePattern(PATRONES_UBICACIONES.ACTUALIZAR)
+  update(
+    @Payload()
+    updateUbicacionDto: UpdateUbicacionMensajeDto,
+  ) {
+    return this.ubicacionesService.update(
+      updateUbicacionDto,
+    );
+  }
+
+  @MessagePattern(PATRONES_UBICACIONES.ELIMINAR)
+  remove(
+    @Payload() idUbicacionDto: IdUbicacionDto,
+  ) {
+    return this.ubicacionesService.remove(
+      idUbicacionDto.IdUbicacion,
+    );
   }
 }
