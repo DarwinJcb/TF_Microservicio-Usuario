@@ -2,7 +2,7 @@
 import { IsInt, Min } from 'class-validator';
 
 export class IdFotoDto {
-    @IsInt()
-    @Min(1)
-    IdFoto: number;
+  @IsInt()
+  @Min(1)
+  IdFoto: number;
 }

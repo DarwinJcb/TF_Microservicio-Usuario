@@ -76,9 +76,7 @@ export class FotosService {
     });
   }
 
-  private async verificarUsuario(
-    IdUsuario: number,
-  ): Promise<void> {
+  private async verificarUsuario(IdUsuario: number): Promise<void> {
     const usuario = await this.prisma.usuario.findUnique({
       where: {
         IdUsuario,

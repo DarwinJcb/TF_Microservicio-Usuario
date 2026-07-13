@@ -1,9 +1,6 @@
 /* src/fotos/fotos.controller.ts: */
 import { Controller } from '@nestjs/common';
-import {
-  MessagePattern,
-  Payload,
-} from '@nestjs/microservices';
+import { MessagePattern, Payload } from '@nestjs/microservices';
 import { IdUsuarioDto } from '../usuarios/dto/id-usuario.dto';
 import { CreateFotoDto } from './dto/create-foto.dto';
 import { IdFotoDto } from './dto/id-foto.dto';
@@ -13,7 +10,7 @@ import { PATRONES_FOTOS } from './patrones/fotos.patrones';
 
 @Controller()
 export class FotosController {
-  constructor(private readonly fotosService: FotosService) { }
+  constructor(private readonly fotosService: FotosService) {}
 
   @MessagePattern(PATRONES_FOTOS.CREAR)
   create(@Payload() createFotoDto: CreateFotoDto) {
@@ -26,32 +23,22 @@ export class FotosController {
   }
 
   @MessagePattern(PATRONES_FOTOS.BUSCAR_POR_USUARIO)
-  findByUsuario(
-    @Payload() idUsuarioDto: IdUsuarioDto,
-  ) {
-    return this.fotosService.findByUsuario(
-      idUsuarioDto.IdUsuario,
-    );
+  findByUsuario(@Payload() idUsuarioDto: IdUsuarioDto) {
+    return this.fotosService.findByUsuario(idUsuarioDto.IdUsuario);
   }
 
   @MessagePattern(PATRONES_FOTOS.BUSCAR)
   findOne(@Payload() idFotoDto: IdFotoDto) {
-    return this.fotosService.findOne(
-      idFotoDto.IdFoto,
-    );
+    return this.fotosService.findOne(idFotoDto.IdFoto);
   }
 
   @MessagePattern(PATRONES_FOTOS.ACTUALIZAR)
-  update(
-    @Payload() updateFotoDto: UpdateFotoMensajeDto,
-  ) {
+  update(@Payload() updateFotoDto: UpdateFotoMensajeDto) {
     return this.fotosService.update(updateFotoDto);
   }
 
   @MessagePattern(PATRONES_FOTOS.ELIMINAR)
   remove(@Payload() idFotoDto: IdFotoDto) {
-    return this.fotosService.remove(
-      idFotoDto.IdFoto,
-    );
+    return this.fotosService.remove(idFotoDto.IdFoto);
   }
 }

@@ -9,4 +9,4 @@ import { FotosService } from './fotos.service';
   controllers: [FotosController],
   providers: [FotosService],
 })
-export class FotosModule { }
+export class FotosModule {}

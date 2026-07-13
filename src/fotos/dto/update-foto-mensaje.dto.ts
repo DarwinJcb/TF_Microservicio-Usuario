@@ -3,7 +3,7 @@ import { IsInt, Min } from 'class-validator';
 import { UpdateFotoDto } from './update-foto.dto';
 
 export class UpdateFotoMensajeDto extends UpdateFotoDto {
-    @IsInt()
-    @Min(1)
-    IdFoto: number;
+  @IsInt()
+  @Min(1)
+  IdFoto: number;
 }
