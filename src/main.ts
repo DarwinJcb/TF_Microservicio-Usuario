@@ -1,17 +1,25 @@
 /* src/main.ts: */
+import {
+  HttpStatus,
+  ValidationPipe,
+} from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { NestFactory } from '@nestjs/core';
 import {
   AsyncMicroserviceOptions,
   MicroserviceOptions,
+  RpcException,
   Transport,
 } from '@nestjs/microservices';
+import { ValidationError } from 'class-validator';
 import { AppModule } from './app.module';
 
 function obtenerHostMicroservicio(
   configService: ConfigService,
 ): string {
-  const host = configService.get<string>('HOST_MICROSERVICIO');
+  const host = configService.get<string>(
+    'HOST_MICROSERVICIO',
+  );
 
   if (!host) {
     throw new Error(
@@ -50,6 +58,14 @@ function obtenerPuertoMicroservicio(
   return puerto;
 }
 
+function obtenerMensajesValidacion(
+  errores: ValidationError[],
+): string[] {
+  return errores.flatMap((error) =>
+    Object.values(error.constraints ?? {}),
+  );
+}
+
 async function bootstrap(): Promise<void> {
   const aplicacion =
     await NestFactory.createMicroservice<AsyncMicroserviceOptions>(
@@ -67,6 +83,22 @@ async function bootstrap(): Promise<void> {
         }),
       },
     );
+
+  aplicacion.useGlobalPipes(
+    new ValidationPipe({
+      whitelist: true,
+      forbidNonWhitelisted: true,
+      transform: true,
+      exceptionFactory: (
+        errores: ValidationError[],
+      ): RpcException =>
+        new RpcException({
+          statusCode: HttpStatus.BAD_REQUEST,
+          message: obtenerMensajesValidacion(errores),
+          error: 'Bad Request',
+        }),
+    }),
+  );
 
   aplicacion.enableShutdownHooks();
 

@@ -1,7 +1,6 @@
 /* src/app.module.ts: */
 import { Module } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
-import { PrismaModule } from './prisma/prisma.module';
 import { UsuariosModule } from './usuarios/usuarios.module';
 
 @Module({
@@ -9,7 +8,6 @@ import { UsuariosModule } from './usuarios/usuarios.module';
     ConfigModule.forRoot({
       isGlobal: true,
     }),
-    PrismaModule,
     UsuariosModule,
   ],
 })
