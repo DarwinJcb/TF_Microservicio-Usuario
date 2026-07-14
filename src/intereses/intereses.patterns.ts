@@ -1,4 +1,4 @@
-/* src/intereses/intereses.patterns.ts */
+/* tf_microservicio-usuarios/src/intereses/intereses.patterns.ts */
 export const INTERESES_PATTERNS = {
   CREAR: 'intereses.crear',
   LISTAR: 'intereses.listar',

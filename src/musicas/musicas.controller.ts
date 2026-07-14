@@ -1,4 +1,4 @@
-/* src/musicas/musicas.controller.ts: */
+/* tf_microservicio-usuarios/src/musicas/musicas.controller.ts */
 import { Controller } from '@nestjs/common';
 import { MessagePattern, Payload } from '@nestjs/microservices';
 import { CreateMusicaDto } from './dto/create-musica.dto';

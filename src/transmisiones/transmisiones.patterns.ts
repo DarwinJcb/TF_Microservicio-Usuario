@@ -1,4 +1,4 @@
-/* src/transmisiones/transmisiones.patterns.ts */
+/* tf_microservicio-usuarios/src/transmisiones/transmisiones.patterns.ts */
 export const TRANSMISIONES_PATTERNS = {
   CREAR: 'transmisiones.crear',
   LISTAR: 'transmisiones.listar',

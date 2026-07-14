@@ -1,4 +1,4 @@
-/* src/transmisiones/dto/transmisiones-payload.dto.ts */
+/* tf_microservicio-usuarios/src/transmisiones/dto/transmisiones-payload.dto.ts */
 import { Type } from 'class-transformer';
 import { IsDefined, IsInt, Min, ValidateNested } from 'class-validator';
 import { UpdateTransmisionDto } from './update-transmision.dto';

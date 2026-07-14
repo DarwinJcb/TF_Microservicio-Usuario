@@ -1,4 +1,4 @@
-/* src/donaciones/donaciones.patterns.ts */
+/* tf_microservicio-usuarios/src/donaciones/donaciones.patterns.ts */
 export const DONACIONES_PATTERNS = {
   CREAR: 'donaciones.crear',
   LISTAR: 'donaciones.listar',

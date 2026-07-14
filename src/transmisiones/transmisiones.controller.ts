@@ -1,4 +1,4 @@
-/* src/transmisiones/transmisiones.controller.ts: */
+/* tf_microservicio-usuarios/src/transmisiones/transmisiones.controller.ts */
 import { Controller } from '@nestjs/common';
 import { MessagePattern, Payload } from '@nestjs/microservices';
 import { CreateTransmisionDto } from './dto/create-transmision.dto';

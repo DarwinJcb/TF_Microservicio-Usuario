@@ -1,4 +1,4 @@
-/* src/usuarios/dto/actualizar-usuario-payload.dto.ts */
+/* tf_microservicio-usuarios/src/usuarios/dto/actualizar-usuario-payload.dto.ts */
 import { Type } from 'class-transformer';
 import { IsDefined, ValidateNested } from 'class-validator';
 import { IdUsuarioDto } from './id-usuario.dto';

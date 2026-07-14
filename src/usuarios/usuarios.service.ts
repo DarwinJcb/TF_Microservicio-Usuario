@@ -1,4 +1,4 @@
-/* src/usuarios/usuarios.service.ts */
+/* tf_microservicio-usuarios/src/usuarios/usuarios.service.ts */
 import { HttpStatus, Injectable } from '@nestjs/common';
 import { RpcException } from '@nestjs/microservices';
 import * as bcrypt from 'bcryptjs';

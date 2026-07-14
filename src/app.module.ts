@@ -1,4 +1,4 @@
-/* src/app.module.ts: */
+/* tf_microservicio-usuarios/src/app.module.ts: */
 import { Module } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
 import { AuthModule } from './auth/auth.module';

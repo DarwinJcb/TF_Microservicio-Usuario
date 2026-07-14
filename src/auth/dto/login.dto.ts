@@ -1,4 +1,4 @@
-/* src/auth/dto/login.dto.ts: */
+/* tf_microservicio-usuarios/src/auth/dto/login.dto.ts: */
 import {
   IsEmail,
   IsNotEmpty,

@@ -1,4 +1,4 @@
-/* src/fotos/fotos.patterns.ts */
+/* tf_microservicio-usuarios/src/fotos/fotos.patterns.ts */
 export const FOTOS_PATTERNS = {
   CREAR: 'fotos.crear',
   LISTAR: 'fotos.listar',

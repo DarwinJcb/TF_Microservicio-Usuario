@@ -1,4 +1,4 @@
-/* src/transmisiones/transmisiones.service.ts: */
+/* tf_microservicio-usuarios/src/transmisiones/transmisiones.service.ts: */
 import { HttpStatus, Injectable } from '@nestjs/common';
 import { RpcException } from '@nestjs/microservices';
 import { EstadoActividad, EstadoTransmision } from '../generated/prisma/enums';

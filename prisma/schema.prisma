@@ -1,5 +1,5 @@
 /**
- * prisma/schema.prisma:
+ * tf_microservicio-usuarios/prisma/schema.prisma
  */
 generator client {
     provider     = "prisma-client"

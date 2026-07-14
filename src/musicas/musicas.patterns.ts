@@ -1,4 +1,4 @@
-/* src/musicas/musicas.patterns.ts */
+/* tf_microservicio-usuarios/src/musicas/musicas.patterns.ts */
 export const MUSICAS_PATTERNS = {
   CREAR: 'musicas.crear',
   LISTAR: 'musicas.listar',

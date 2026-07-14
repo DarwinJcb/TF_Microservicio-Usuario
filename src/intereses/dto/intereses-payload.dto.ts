@@ -1,4 +1,4 @@
-/* src/intereses/dto/intereses-payload.dto.ts */
+/* tf_microservicio-usuarios/src/intereses/dto/intereses-payload.dto.ts */
 import { Type } from 'class-transformer';
 import { IsDefined, IsInt, Min, ValidateNested } from 'class-validator';
 import { UpdateInteresDto } from './update-interes.dto';

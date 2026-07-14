@@ -1,4 +1,4 @@
-/* src/ubicaciones/ubicaciones.controller.ts: */
+/* tf_microservicio-usuarios/src/ubicaciones/ubicaciones.controller.ts */
 import { Controller } from '@nestjs/common';
 import { MessagePattern, Payload } from '@nestjs/microservices';
 import { CreateUbicacionDto } from './dto/create-ubicacion.dto';

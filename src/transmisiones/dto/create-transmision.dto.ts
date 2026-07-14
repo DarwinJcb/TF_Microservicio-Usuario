@@ -1,4 +1,4 @@
-/* src/transmisiones/dto/create-transmision.dto.ts: */
+/* tf_microservicio-usuarios/src/transmisiones/dto/create-transmision.dto.ts */
 import { IsInt } from 'class-validator';
 
 export class CreateTransmisionDto {

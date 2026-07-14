@@ -1,4 +1,4 @@
-/* src/usuarios/usuarios.module.ts */
+/* tf_microservicio-usuarios/src/usuarios/usuarios.module.ts */
 import { Module } from '@nestjs/common';
 import { PrismaModule } from '../prisma/prisma.module';
 import { UsuariosController } from './usuarios.controller';

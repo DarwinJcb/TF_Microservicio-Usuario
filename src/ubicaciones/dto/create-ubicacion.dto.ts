@@ -1,4 +1,4 @@
-/* src/ubicaciones/dto/create-ubicacion.dto.ts: */
+/* tf_microservicio-usuarios/src/ubicaciones/dto/create-ubicacion.dto.ts */
 import { IsInt, IsNotEmpty, IsOptional, IsString } from 'class-validator';
 
 export class CreateUbicacionDto {

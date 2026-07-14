@@ -1,4 +1,4 @@
-/* src/musicas/musicas.service.ts: */
+/* tf_microservicio-usuarios/src/musicas/musicas.service.ts */
 import { HttpStatus, Injectable } from '@nestjs/common';
 import { RpcException } from '@nestjs/microservices';
 import { PrismaService } from '../prisma/prisma.service';

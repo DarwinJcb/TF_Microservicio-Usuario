@@ -1,4 +1,4 @@
-/* src/ubicaciones/dto/ubicaciones-payload.dto.ts */
+/* tf_microservicio-usuarios/src/ubicaciones/dto/ubicaciones-payload.dto.ts */
 import { Type } from 'class-transformer';
 import { IsDefined, IsInt, Min, ValidateNested } from 'class-validator';
 import { UpdateUbicacionDto } from './update-ubicacion.dto';

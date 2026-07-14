@@ -1,4 +1,4 @@
-/* src/main.ts: */
+/* tf_microservicio-usuarios/src/main.ts: */
 import { HttpStatus, Logger, ValidationPipe } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { NestFactory } from '@nestjs/core';

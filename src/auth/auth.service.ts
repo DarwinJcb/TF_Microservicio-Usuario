@@ -1,4 +1,4 @@
-/* src/auth/auth.service.ts */
+/* tf_microservicio-usuarios/src/auth/auth.service.ts */
 import { HttpStatus, Injectable } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { RpcException } from '@nestjs/microservices';

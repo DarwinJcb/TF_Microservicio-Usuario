@@ -1,4 +1,4 @@
-/* src/intereses/intereses.controller.ts */
+/* tf_microservicio-usuarios/src/intereses/intereses.controller.ts */
 import { Controller } from '@nestjs/common';
 import { MessagePattern, Payload } from '@nestjs/microservices';
 import { CreateInteresDto } from './dto/create-interes.dto';

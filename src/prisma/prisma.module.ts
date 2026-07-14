@@ -1,4 +1,4 @@
-/* src/prisma/prisma.module.ts: */
+/* tf_microservicio-usuarios/src/prisma/prisma.module.ts */
 import { Module } from '@nestjs/common';
 import { PrismaService } from './prisma.service';
 

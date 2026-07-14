@@ -1,4 +1,4 @@
-/* src/ubicaciones/ubicaciones.patterns.ts */
+/* tf_microservicio-usuarios/src/ubicaciones/ubicaciones.patterns.ts */
 export const UBICACIONES_PATTERNS = {
   CREAR: 'ubicaciones.crear',
   LISTAR: 'ubicaciones.listar',

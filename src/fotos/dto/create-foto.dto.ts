@@ -1,4 +1,4 @@
-/* src/fotos/dto/create-foto.dto.ts: */
+/* tf_microservicio-usuarios/src/fotos/dto/create-foto.dto.ts */
 import { IsInt, IsNotEmpty, IsString } from 'class-validator';
 
 export class CreateFotoDto {

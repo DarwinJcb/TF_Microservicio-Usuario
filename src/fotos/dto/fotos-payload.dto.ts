@@ -1,4 +1,4 @@
-/* src/fotos/dto/fotos-payload.dto.ts */
+/* tf_microservicio-usuarios/src/fotos/dto/fotos-payload.dto.ts */
 import { Type } from 'class-transformer';
 import { IsDefined, IsInt, Min, ValidateNested } from 'class-validator';
 import { UpdateFotoDto } from './update-foto.dto';

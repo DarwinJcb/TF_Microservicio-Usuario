@@ -1,4 +1,4 @@
-/* src/usuarios/dto/create-usuario.dto.ts */
+/* tf_microservicio-usuarios/src/usuarios/dto/create-usuario.dto.ts */
 import {
   IsEmail,
   IsEnum,

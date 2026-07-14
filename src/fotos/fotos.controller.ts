@@ -1,4 +1,4 @@
-/* src/fotos/fotos.controller.ts: */
+/* tf_microservicio-usuarios/src/fotos/fotos.controller.ts */
 import { Controller } from '@nestjs/common';
 import { MessagePattern, Payload } from '@nestjs/microservices';
 import { CreateFotoDto } from './dto/create-foto.dto';

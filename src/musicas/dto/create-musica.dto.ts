@@ -1,4 +1,4 @@
-/* src/musicas/dto/create-musica.dto.ts: */
+/* tf_microservicio-usuarios/src/musicas/dto/create-musica.dto.ts */
 import { IsInt, IsNotEmpty, IsOptional, IsString } from 'class-validator';
 
 export class CreateMusicaDto {

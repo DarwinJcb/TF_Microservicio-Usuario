@@ -1,4 +1,4 @@
-/* src/usuarios/usuarios.controller.ts */
+/* tf_microservicio-usuarios/src/usuarios/usuarios.controller.ts */
 import { Controller } from '@nestjs/common';
 import { MessagePattern, Payload } from '@nestjs/microservices';
 import { ActualizarUsuarioPayloadDto } from './dto/actualizar-usuario-payload.dto';

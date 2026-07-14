@@ -1,4 +1,4 @@
-/* src/auth/config/jwt.config.ts */
+/* tf_microservicio-usuarios/src/auth/config/jwt.config.ts */
 import { ConfigService } from '@nestjs/config';
 
 export const DURACION_TOKEN_SEGUNDOS = 60 * 60 * 24 * 30;

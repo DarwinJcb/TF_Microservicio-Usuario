@@ -1,4 +1,4 @@
-/* src/auth/auth.patterns.ts */
+/* tf_microservicio-usuarios/src/auth/auth.patterns.ts */
 export const AUTH_PATTERNS = {
   LOGIN: 'auth.login',
 } as const;

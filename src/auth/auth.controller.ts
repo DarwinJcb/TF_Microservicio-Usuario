@@ -1,4 +1,4 @@
-/* src/auth/auth.controller.ts */
+/* tf_microservicio-usuarios/src/auth/auth.controller.ts */
 import { Controller } from '@nestjs/common';
 import { MessagePattern, Payload } from '@nestjs/microservices';
 import { AUTH_PATTERNS } from './auth.patterns';

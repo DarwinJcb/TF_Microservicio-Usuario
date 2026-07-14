@@ -1,5 +1,4 @@
-/* src/intereses/dto/create-interes.dto.ts */
-/* src/intereses/dto/create-interes.dto.ts */
+/* tf_microservicio-usuarios/src/intereses/dto/create-interes.dto.ts */
 import { IsEnum, IsInt, IsOptional, IsString } from 'class-validator';
 import { SignoZodiacal } from '../../generated/prisma/enums';
 

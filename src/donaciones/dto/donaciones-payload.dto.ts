@@ -1,4 +1,4 @@
-/* src/donaciones/dto/donaciones-payload.dto.ts */
+/* tf_microservicio-usuarios/src/donaciones/dto/donaciones-payload.dto.ts */
 import { Type } from 'class-transformer';
 import { IsDefined, IsInt, Min, ValidateNested } from 'class-validator';
 import { UpdateDonacionDto } from './update-donacion.dto';

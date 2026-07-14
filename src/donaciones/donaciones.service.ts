@@ -1,4 +1,4 @@
-/* src/donaciones/donaciones.service.ts: */
+/* tf_microservicio-usuarios/src/donaciones/donaciones.service.ts */
 import { HttpStatus, Injectable } from '@nestjs/common';
 import { RpcException } from '@nestjs/microservices';
 import { EstadoTransmision } from '../generated/prisma/enums';

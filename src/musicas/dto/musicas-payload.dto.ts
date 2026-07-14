@@ -1,4 +1,4 @@
-/* src/musicas/dto/musicas-payload.dto.ts */
+/* tf_microservicio-usuarios/src/musicas/dto/musicas-payload.dto.ts */
 import { Type } from 'class-transformer';
 import { IsDefined, IsInt, Min, ValidateNested } from 'class-validator';
 import { UpdateMusicaDto } from './update-musica.dto';
