@@ -1,11 +1,11 @@
 /* src/fotos/fotos.module.ts: */
 import { Module } from '@nestjs/common';
-import { PrismaUsuariosModule } from '../prisma-usuarios/prisma-usuarios.module';
+import { PrismaModule } from '../prisma/prisma.module';
 import { FotosController } from './fotos.controller';
 import { FotosService } from './fotos.service';
 
 @Module({
-  imports: [PrismaUsuariosModule],
+  imports: [PrismaModule],
   controllers: [FotosController],
   providers: [FotosService],
 })

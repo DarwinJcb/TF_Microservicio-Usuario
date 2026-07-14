@@ -1,11 +1,11 @@
 /* src/intereses/intereses.module.ts */
 import { Module } from '@nestjs/common';
-import { PrismaUsuariosModule } from '../prisma-usuarios/prisma-usuarios.module';
+import { PrismaModule } from '../prisma/prisma.module';
 import { InteresesController } from './intereses.controller';
 import { InteresesService } from './intereses.service';
 
 @Module({
-  imports: [PrismaUsuariosModule],
+  imports: [PrismaModule],
   controllers: [InteresesController],
   providers: [InteresesService],
 })

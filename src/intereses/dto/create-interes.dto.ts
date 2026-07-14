@@ -1,6 +1,7 @@
 /* src/intereses/dto/create-interes.dto.ts */
+/* src/intereses/dto/create-interes.dto.ts */
 import { IsEnum, IsInt, IsOptional, IsString } from 'class-validator';
-import { SignoZodiacal } from '../../generated/prisma-usuarios/enums';
+import { SignoZodiacal } from '../../generated/prisma/enums';
 
 export class CreateInteresDto {
   @IsOptional()

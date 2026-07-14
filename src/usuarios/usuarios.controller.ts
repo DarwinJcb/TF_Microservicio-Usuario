@@ -1,50 +1,56 @@
-/* src/usuarios/usuarios.controller.ts: */
-import {
-  Body,
-  Controller,
-  Delete,
-  Get,
-  Param,
-  ParseIntPipe,
-  Patch,
-  Post,
-  UseGuards,
-} from '@nestjs/common';
-import { JwtAuthGuard } from '../auth/jwt-auth.guard';
+/* src/usuarios/usuarios.controller.ts */
+import { Controller } from '@nestjs/common';
+import { MessagePattern, Payload } from '@nestjs/microservices';
+import { ActualizarUsuarioPayloadDto } from './dto/actualizar-usuario-payload.dto';
 import { CreateUsuarioDto } from './dto/create-usuario.dto';
-import { UpdateUsuarioDto } from './dto/update-usuario.dto';
+import { IdUsuarioDto } from './dto/id-usuario.dto';
+import { USUARIOS_PATTERNS } from './usuarios.patterns';
 import { UsuariosService } from './usuarios.service';
 
-@Controller('usuarios')
+@Controller()
 export class UsuariosController {
   constructor(private readonly usuariosService: UsuariosService) {}
 
-  @Post()
-  create(@Body() createUsuarioDto: CreateUsuarioDto) {
+  @MessagePattern(USUARIOS_PATTERNS.CREAR)
+  create(@Payload() createUsuarioDto: CreateUsuarioDto) {
     return this.usuariosService.create(createUsuarioDto);
   }
 
-  @Get()
-  @UseGuards(JwtAuthGuard)
+  @MessagePattern(USUARIOS_PATTERNS.LISTAR)
   findAll() {
     return this.usuariosService.findAll();
   }
 
-  @Get(':id')
-  findOne(@Param('id', ParseIntPipe) id: number) {
-    return this.usuariosService.findOne(id);
+  @MessagePattern(USUARIOS_PATTERNS.BUSCAR_POR_ID)
+  findOne(@Payload() idUsuarioDto: IdUsuarioDto) {
+    return this.usuariosService.findOne(idUsuarioDto.IdUsuario);
   }
 
-  @Patch(':id')
+  @MessagePattern(USUARIOS_PATTERNS.ACTUALIZAR)
   update(
-    @Param('id', ParseIntPipe) id: number,
-    @Body() updateUsuarioDto: UpdateUsuarioDto,
+    @Payload()
+    actualizarUsuarioPayloadDto: ActualizarUsuarioPayloadDto,
   ) {
-    return this.usuariosService.update(id, updateUsuarioDto);
+    return this.usuariosService.update(
+      actualizarUsuarioPayloadDto.IdUsuario,
+      actualizarUsuarioPayloadDto.datosUsuario,
+    );
   }
 
-  @Delete(':id')
-  remove(@Param('id', ParseIntPipe) id: number) {
-    return this.usuariosService.remove(id);
+  @MessagePattern(USUARIOS_PATTERNS.ELIMINAR)
+  remove(@Payload() idUsuarioDto: IdUsuarioDto) {
+    return this.usuariosService.remove(idUsuarioDto.IdUsuario);
+  }
+
+  @MessagePattern(USUARIOS_PATTERNS.VERIFICAR_EXISTENCIA)
+  verificarExistencia(@Payload() idUsuarioDto: IdUsuarioDto) {
+    return this.usuariosService.verificarExistencia(idUsuarioDto.IdUsuario);
+  }
+
+  @MessagePattern(USUARIOS_PATTERNS.VERIFICAR_DEPENDENCIAS_LOCALES)
+  verificarDependenciasLocales(@Payload() idUsuarioDto: IdUsuarioDto) {
+    return this.usuariosService.verificarDependenciasLocales(
+      idUsuarioDto.IdUsuario,
+    );
   }
 }

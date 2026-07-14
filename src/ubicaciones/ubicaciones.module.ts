@@ -1,11 +1,11 @@
 /* src/ubicaciones/ubicaciones.module.ts: */
 import { Module } from '@nestjs/common';
-import { PrismaUsuariosModule } from '../prisma-usuarios/prisma-usuarios.module';
+import { PrismaModule } from '../prisma/prisma.module';
 import { UbicacionesController } from './ubicaciones.controller';
 import { UbicacionesService } from './ubicaciones.service';
 
 @Module({
-  imports: [PrismaUsuariosModule],
+  imports: [PrismaModule],
   controllers: [UbicacionesController],
   providers: [UbicacionesService],
 })

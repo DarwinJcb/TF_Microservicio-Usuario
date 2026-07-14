@@ -1,29 +1,30 @@
 /* src/ubicaciones/ubicaciones.service.ts: */
-import { Injectable, NotFoundException } from '@nestjs/common';
-import { PrismaUsuariosService } from '../prisma-usuarios/prisma-usuarios.service';
+import { HttpStatus, Injectable } from '@nestjs/common';
+import { RpcException } from '@nestjs/microservices';
+import { PrismaService } from '../prisma/prisma.service';
 import { CreateUbicacionDto } from './dto/create-ubicacion.dto';
 import { UpdateUbicacionDto } from './dto/update-ubicacion.dto';
 
 @Injectable()
 export class UbicacionesService {
-  constructor(private readonly prismaUsuarios: PrismaUsuariosService) {}
+  constructor(private readonly prisma: PrismaService) {}
 
   async create(createUbicacionDto: CreateUbicacionDto) {
     await this.verificarUsuario(createUbicacionDto.UsuarioFK);
 
-    return this.prismaUsuarios.ubicacion.create({
+    return this.prisma.ubicacion.create({
       data: createUbicacionDto,
     });
   }
 
   findAll() {
-    return this.prismaUsuarios.ubicacion.findMany();
+    return this.prisma.ubicacion.findMany();
   }
 
   async findByUsuario(idUsuario: number) {
     await this.verificarUsuario(idUsuario);
 
-    return this.prismaUsuarios.ubicacion.findMany({
+    return this.prisma.ubicacion.findMany({
       where: {
         UsuarioFK: idUsuario,
       },
@@ -31,14 +32,18 @@ export class UbicacionesService {
   }
 
   async findOne(id: number) {
-    const ubicacion = await this.prismaUsuarios.ubicacion.findUnique({
+    const ubicacion = await this.prisma.ubicacion.findUnique({
       where: {
         IdUbicacion: id,
       },
     });
 
     if (!ubicacion) {
-      throw new NotFoundException(`No existe una ubicación con el ID ${id}.`);
+      throw new RpcException({
+        statusCode: HttpStatus.NOT_FOUND,
+        message: `No existe una ubicación con el ID ${id}.`,
+        error: 'Not Found',
+      });
     }
 
     return ubicacion;
@@ -51,7 +56,7 @@ export class UbicacionesService {
       await this.verificarUsuario(updateUbicacionDto.UsuarioFK);
     }
 
-    return this.prismaUsuarios.ubicacion.update({
+    return this.prisma.ubicacion.update({
       where: {
         IdUbicacion: id,
       },
@@ -62,7 +67,7 @@ export class UbicacionesService {
   async remove(id: number) {
     await this.findOne(id);
 
-    return this.prismaUsuarios.ubicacion.delete({
+    return this.prisma.ubicacion.delete({
       where: {
         IdUbicacion: id,
       },
@@ -70,7 +75,7 @@ export class UbicacionesService {
   }
 
   private async verificarUsuario(idUsuario: number): Promise<void> {
-    const usuario = await this.prismaUsuarios.usuario.findUnique({
+    const usuario = await this.prisma.usuario.findUnique({
       where: {
         IdUsuario: idUsuario,
       },
@@ -80,9 +85,11 @@ export class UbicacionesService {
     });
 
     if (!usuario) {
-      throw new NotFoundException(
-        `No existe un usuario con el ID ${idUsuario}.`,
-      );
+      throw new RpcException({
+        statusCode: HttpStatus.NOT_FOUND,
+        message: `No existe un usuario con el ID ${idUsuario}.`,
+        error: 'Not Found',
+      });
     }
   }
 }

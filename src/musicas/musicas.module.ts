@@ -1,11 +1,11 @@
 /* src/musicas/musicas.module.ts: */
 import { Module } from '@nestjs/common';
-import { PrismaUsuariosModule } from '../prisma-usuarios/prisma-usuarios.module';
+import { PrismaModule } from '../prisma/prisma.module';
 import { MusicasController } from './musicas.controller';
 import { MusicasService } from './musicas.service';
 
 @Module({
-  imports: [PrismaUsuariosModule],
+  imports: [PrismaModule],
   controllers: [MusicasController],
   providers: [MusicasService],
 })

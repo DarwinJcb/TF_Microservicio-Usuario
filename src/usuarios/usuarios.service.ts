@@ -1,28 +1,24 @@
-/* src/usuarios/usuarios.service.ts: */
-import {
-  ConflictException,
-  Injectable,
-  NotFoundException,
-} from '@nestjs/common';
+/* src/usuarios/usuarios.service.ts */
+import { HttpStatus, Injectable } from '@nestjs/common';
+import { RpcException } from '@nestjs/microservices';
 import * as bcrypt from 'bcryptjs';
-import { PrismaInteraccionesService } from '../prisma-interacciones/prisma-interacciones.service';
-import { PrismaSuscripcionesService } from '../prisma-suscripciones/prisma-suscripciones.service';
-import { PrismaUsuariosService } from '../prisma-usuarios/prisma-usuarios.service';
+import { PrismaService } from '../prisma/prisma.service';
 import { CreateUsuarioDto } from './dto/create-usuario.dto';
 import { UpdateUsuarioDto } from './dto/update-usuario.dto';
 
 const RONDAS_HASH_CONTRASENA = 10;
 
+export interface ResultadoDependenciasLocales {
+  tieneDependencias: boolean;
+  dependencias: string[];
+}
+
 @Injectable()
 export class UsuariosService {
-  constructor(
-    private readonly prismaUsuarios: PrismaUsuariosService,
-    private readonly prismaSuscripciones: PrismaSuscripcionesService,
-    private readonly prismaInteracciones: PrismaInteraccionesService,
-  ) {}
+  constructor(private readonly prisma: PrismaService) {}
 
   async create(createUsuarioDto: CreateUsuarioDto) {
-    const usuarioExistente = await this.prismaUsuarios.usuario.findFirst({
+    const usuarioExistente = await this.prisma.usuario.findFirst({
       where: {
         OR: [
           {
@@ -33,12 +29,17 @@ export class UsuariosService {
           },
         ],
       },
+      select: {
+        IdUsuario: true,
+      },
     });
 
     if (usuarioExistente) {
-      throw new ConflictException(
-        'El correo o el número de teléfono ya están registrados.',
-      );
+      throw new RpcException({
+        statusCode: HttpStatus.CONFLICT,
+        message: 'El correo o el número de teléfono ya están registrados.',
+        error: 'Conflict',
+      });
     }
 
     const { contrasena, ...datosUsuario } = createUsuarioDto;
@@ -48,7 +49,7 @@ export class UsuariosService {
       RONDAS_HASH_CONTRASENA,
     );
 
-    return this.prismaUsuarios.usuario.create({
+    return this.prisma.usuario.create({
       data: {
         ...datosUsuario,
         contrasenaHash,
@@ -56,49 +57,24 @@ export class UsuariosService {
     });
   }
 
-  async findAll() {
-    const usuarios = await this.prismaUsuarios.usuario.findMany({
+  findAll() {
+    return this.prisma.usuario.findMany({
       include: {
         interes: true,
         fotos: true,
         ubicaciones: true,
         musicas: true,
       },
-    });
-
-    if (usuarios.length === 0) {
-      return [];
-    }
-
-    const identificadoresUsuarios = usuarios.map(
-      (usuario) => usuario.IdUsuario,
-    );
-
-    const suscripciones = await this.prismaSuscripciones.suscripcion.findMany({
-      where: {
-        UsuarioFK: {
-          in: identificadoresUsuarios,
-        },
-      },
-      include: {
-        planSuscripcion: true,
+      orderBy: {
+        IdUsuario: 'asc',
       },
     });
-
-    const suscripcionesPorUsuario = new Map(
-      suscripciones.map((suscripcion) => [suscripcion.UsuarioFK, suscripcion]),
-    );
-
-    return usuarios.map((usuario) => ({
-      ...usuario,
-      suscripcion: suscripcionesPorUsuario.get(usuario.IdUsuario) ?? null,
-    }));
   }
 
-  async findOne(id: number) {
-    const usuario = await this.prismaUsuarios.usuario.findUnique({
+  async findOne(idUsuario: number) {
+    const usuario = await this.prisma.usuario.findUnique({
       where: {
-        IdUsuario: id,
+        IdUsuario: idUsuario,
       },
       include: {
         interes: true,
@@ -109,240 +85,209 @@ export class UsuariosService {
     });
 
     if (!usuario) {
-      throw new NotFoundException(`No existe un usuario con el ID ${id}.`);
+      throw new RpcException({
+        statusCode: HttpStatus.NOT_FOUND,
+        message: `No existe un usuario con el ID ${idUsuario}.`,
+        error: 'Not Found',
+      });
     }
 
-    const suscripcion = await this.prismaSuscripciones.suscripcion.findUnique({
-      where: {
-        UsuarioFK: id,
-      },
-      include: {
-        planSuscripcion: true,
-      },
-    });
-
-    return {
-      ...usuario,
-      suscripcion,
-    };
+    return usuario;
   }
 
-  async update(id: number, updateUsuarioDto: UpdateUsuarioDto) {
-    await this.verificarUsuarioExiste(id);
+  async update(idUsuario: number, updateUsuarioDto: UpdateUsuarioDto) {
+    await this.asegurarUsuarioExiste(idUsuario);
 
     if (updateUsuarioDto.correo !== undefined) {
-      const usuarioConCorreo = await this.prismaUsuarios.usuario.findFirst({
+      const usuarioConCorreo = await this.prisma.usuario.findFirst({
         where: {
           correo: updateUsuarioDto.correo,
           NOT: {
-            IdUsuario: id,
+            IdUsuario: idUsuario,
           },
+        },
+        select: {
+          IdUsuario: true,
         },
       });
 
       if (usuarioConCorreo) {
-        throw new ConflictException('El correo ya está registrado.');
+        throw new RpcException({
+          statusCode: HttpStatus.CONFLICT,
+          message: 'El correo ya está registrado.',
+          error: 'Conflict',
+        });
       }
     }
 
     if (updateUsuarioDto.numeroTelefono !== undefined) {
-      const usuarioConTelefono = await this.prismaUsuarios.usuario.findFirst({
+      const usuarioConTelefono = await this.prisma.usuario.findFirst({
         where: {
           numeroTelefono: updateUsuarioDto.numeroTelefono,
           NOT: {
-            IdUsuario: id,
+            IdUsuario: idUsuario,
           },
+        },
+        select: {
+          IdUsuario: true,
         },
       });
 
       if (usuarioConTelefono) {
-        throw new ConflictException(
-          'El número de teléfono ya está registrado.',
-        );
+        throw new RpcException({
+          statusCode: HttpStatus.CONFLICT,
+          message: 'El número de teléfono ya está registrado.',
+          error: 'Conflict',
+        });
       }
     }
 
-    return this.prismaUsuarios.usuario.update({
+    return this.prisma.usuario.update({
       where: {
-        IdUsuario: id,
+        IdUsuario: idUsuario,
       },
       data: updateUsuarioDto,
     });
   }
 
-  async remove(id: number) {
-    await this.verificarUsuarioExiste(id);
-
-    const [
-      interes,
-      foto,
-      ubicacion,
-      musica,
-      transmision,
-      donacion,
-      suscripcion,
-      interaccion,
-      match,
-      mensaje,
-      reporte,
-    ] = await Promise.all([
-      this.prismaUsuarios.interes.findUnique({
-        where: {
-          UsuarioFK: id,
-        },
-        select: {
-          IdInteres: true,
-        },
-      }),
-      this.prismaUsuarios.foto.findFirst({
-        where: {
-          UsuarioFK: id,
-        },
-        select: {
-          IdFoto: true,
-        },
-      }),
-      this.prismaUsuarios.ubicacion.findFirst({
-        where: {
-          UsuarioFK: id,
-        },
-        select: {
-          IdUbicacion: true,
-        },
-      }),
-      this.prismaUsuarios.musica.findFirst({
-        where: {
-          UsuarioFK: id,
-        },
-        select: {
-          IdMusica: true,
-        },
-      }),
-      this.prismaUsuarios.transmision.findFirst({
-        where: {
-          UsuarioFK: id,
-        },
-        select: {
-          IdTransmision: true,
-        },
-      }),
-      this.prismaUsuarios.donacion.findFirst({
-        where: {
-          OR: [
-            {
-              UsuarioDonanteFK: id,
-            },
-            {
-              UsuarioReceptorFK: id,
-            },
-          ],
-        },
-        select: {
-          IdDonacion: true,
-        },
-      }),
-      this.prismaSuscripciones.suscripcion.findUnique({
-        where: {
-          UsuarioFK: id,
-        },
-        select: {
-          IdSuscripcion: true,
-        },
-      }),
-      this.prismaInteracciones.interaccion.findFirst({
-        where: {
-          OR: [
-            {
-              UsuarioEmisorFK: id,
-            },
-            {
-              UsuarioReceptorFK: id,
-            },
-          ],
-        },
-        select: {
-          IdInteraccion: true,
-        },
-      }),
-      this.prismaInteracciones.match.findFirst({
-        where: {
-          OR: [
-            {
-              UsuarioUnoFK: id,
-            },
-            {
-              UsuarioDosFK: id,
-            },
-          ],
-        },
-        select: {
-          IdMatch: true,
-        },
-      }),
-      this.prismaInteracciones.mensaje.findFirst({
-        where: {
-          UsuarioEmisorFK: id,
-        },
-        select: {
-          IdMensaje: true,
-        },
-      }),
-      this.prismaInteracciones.reporte.findFirst({
-        where: {
-          OR: [
-            {
-              UsuarioReportanteFK: id,
-            },
-            {
-              UsuarioReportadoFK: id,
-            },
-          ],
-        },
-        select: {
-          IdReporte: true,
-        },
-      }),
-    ]);
-
-    const tieneDependencias = [
-      interes,
-      foto,
-      ubicacion,
-      musica,
-      transmision,
-      donacion,
-      suscripcion,
-      interaccion,
-      match,
-      mensaje,
-      reporte,
-    ].some((dependencia) => dependencia !== null);
-
-    if (tieneDependencias) {
-      throw new ConflictException(
-        'No se puede eliminar el usuario porque tiene información asociada en el sistema.',
-      );
-    }
-
-    return this.prismaUsuarios.usuario.delete({
+  async verificarExistencia(idUsuario: number): Promise<boolean> {
+    const usuario = await this.prisma.usuario.findUnique({
       where: {
-        IdUsuario: id,
-      },
-    });
-  }
-
-  private async verificarUsuarioExiste(id: number): Promise<void> {
-    const usuario = await this.prismaUsuarios.usuario.findUnique({
-      where: {
-        IdUsuario: id,
+        IdUsuario: idUsuario,
       },
       select: {
         IdUsuario: true,
       },
     });
 
-    if (!usuario) {
-      throw new NotFoundException(`No existe un usuario con el ID ${id}.`);
+    return usuario !== null;
+  }
+
+  async verificarDependenciasLocales(
+    idUsuario: number,
+  ): Promise<ResultadoDependenciasLocales> {
+    await this.asegurarUsuarioExiste(idUsuario);
+
+    const [interes, foto, ubicacion, musica, transmision, donacion] =
+      await Promise.all([
+        this.prisma.interes.findUnique({
+          where: {
+            UsuarioFK: idUsuario,
+          },
+          select: {
+            IdInteres: true,
+          },
+        }),
+        this.prisma.foto.findFirst({
+          where: {
+            UsuarioFK: idUsuario,
+          },
+          select: {
+            IdFoto: true,
+          },
+        }),
+        this.prisma.ubicacion.findFirst({
+          where: {
+            UsuarioFK: idUsuario,
+          },
+          select: {
+            IdUbicacion: true,
+          },
+        }),
+        this.prisma.musica.findFirst({
+          where: {
+            UsuarioFK: idUsuario,
+          },
+          select: {
+            IdMusica: true,
+          },
+        }),
+        this.prisma.transmision.findFirst({
+          where: {
+            UsuarioFK: idUsuario,
+          },
+          select: {
+            IdTransmision: true,
+          },
+        }),
+        this.prisma.donacion.findFirst({
+          where: {
+            OR: [
+              {
+                UsuarioDonanteFK: idUsuario,
+              },
+              {
+                UsuarioReceptorFK: idUsuario,
+              },
+            ],
+          },
+          select: {
+            IdDonacion: true,
+          },
+        }),
+      ]);
+
+    const dependencias: string[] = [];
+
+    if (interes) {
+      dependencias.push('intereses');
+    }
+
+    if (foto) {
+      dependencias.push('fotos');
+    }
+
+    if (ubicacion) {
+      dependencias.push('ubicaciones');
+    }
+
+    if (musica) {
+      dependencias.push('musicas');
+    }
+
+    if (transmision) {
+      dependencias.push('transmisiones');
+    }
+
+    if (donacion) {
+      dependencias.push('donaciones');
+    }
+
+    return {
+      tieneDependencias: dependencias.length > 0,
+      dependencias,
+    };
+  }
+
+  async remove(idUsuario: number) {
+    const resultadoDependencias =
+      await this.verificarDependenciasLocales(idUsuario);
+
+    if (resultadoDependencias.tieneDependencias) {
+      throw new RpcException({
+        statusCode: HttpStatus.CONFLICT,
+        message:
+          'No se puede eliminar el usuario porque tiene información asociada en el dominio de usuarios.',
+        error: 'Conflict',
+      });
+    }
+
+    return this.prisma.usuario.delete({
+      where: {
+        IdUsuario: idUsuario,
+      },
+    });
+  }
+
+  private async asegurarUsuarioExiste(idUsuario: number): Promise<void> {
+    const existe = await this.verificarExistencia(idUsuario);
+
+    if (!existe) {
+      throw new RpcException({
+        statusCode: HttpStatus.NOT_FOUND,
+        message: `No existe un usuario con el ID ${idUsuario}.`,
+        error: 'Not Found',
+      });
     }
   }
 }

@@ -1,6 +1,6 @@
 /* src/transmisiones/dto/update-transmision.dto.ts: */
 import { IsEnum } from 'class-validator';
-import { EstadoTransmision } from '../../generated/prisma-usuarios/enums';
+import { EstadoTransmision } from '../../generated/prisma/enums';
 
 export class UpdateTransmisionDto {
   @IsEnum(EstadoTransmision)

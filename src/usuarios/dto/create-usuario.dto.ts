@@ -1,4 +1,4 @@
-/* src/usuarios/dto/create-usuario.dto.ts: */
+/* src/usuarios/dto/create-usuario.dto.ts */
 import {
   IsEmail,
   IsEnum,
@@ -10,7 +10,7 @@ import {
   MaxLength,
   MinLength,
 } from 'class-validator';
-import { Genero } from '../../generated/prisma-usuarios/enums';
+import { Genero } from '../../generated/prisma/enums';
 
 export class CreateUsuarioDto {
   @IsString()

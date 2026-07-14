@@ -250,8 +250,7 @@ export class DonacionesService {
     if (transmision.estado !== EstadoTransmision.LIVE) {
       throw new RpcException({
         statusCode: HttpStatus.BAD_REQUEST,
-        message:
-          'Solo se pueden registrar donaciones en transmisiones LIVE.',
+        message: 'Solo se pueden registrar donaciones en transmisiones LIVE.',
         error: 'Bad Request',
       });
     }
@@ -259,8 +258,7 @@ export class DonacionesService {
     if (transmision.UsuarioFK !== idUsuarioReceptor) {
       throw new RpcException({
         statusCode: HttpStatus.BAD_REQUEST,
-        message:
-          'El usuario receptor no es el propietario de la transmisión.',
+        message: 'El usuario receptor no es el propietario de la transmisión.',
         error: 'Bad Request',
       });
     }

@@ -1,5 +1,5 @@
 /* src/main.ts: */
-import { HttpStatus, ValidationPipe } from '@nestjs/common';
+import { HttpStatus, Logger, ValidationPipe } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { NestFactory } from '@nestjs/core';
 import {
@@ -10,6 +10,8 @@ import {
 } from '@nestjs/microservices';
 import { ValidationError } from 'class-validator';
 import { AppModule } from './app.module';
+
+const logger = new Logger('MicroservicioUsuarios');
 
 function obtenerHostMicroservicio(configService: ConfigService): string {
   const host = configService.get<string>('HOST_MICROSERVICIO');
@@ -76,11 +78,27 @@ async function bootstrap(): Promise<void> {
 
   aplicacion.enableShutdownHooks();
 
+  const configService = aplicacion.get(ConfigService);
+  const host = obtenerHostMicroservicio(configService);
+  const puerto = obtenerPuertoMicroservicio(configService);
+
   await aplicacion.listen();
+
+  logger.log(
+    `Microservicio de Usuarios iniciado y escuchando por TCP en ${host}:${puerto}`,
+  );
 }
 
 bootstrap().catch((error: unknown) => {
-  console.error('No se pudo iniciar el microservicio de usuarios.', error);
+  const mensajeError =
+    error instanceof Error ? error.message : String(error);
+
+  const trazaError = error instanceof Error ? error.stack : undefined;
+
+  logger.error(
+    `No se pudo iniciar el microservicio de usuarios: ${mensajeError}`,
+    trazaError,
+  );
 
   process.exit(1);
 });
