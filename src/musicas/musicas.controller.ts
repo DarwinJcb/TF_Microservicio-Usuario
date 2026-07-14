@@ -1,52 +1,60 @@
 /* src/musicas/musicas.controller.ts: */
-import {
-  Body,
-  Controller,
-  Delete,
-  Get,
-  Param,
-  ParseIntPipe,
-  Patch,
-  Post,
-} from '@nestjs/common';
+import { Controller } from '@nestjs/common';
+import { MessagePattern, Payload } from '@nestjs/microservices';
 import { CreateMusicaDto } from './dto/create-musica.dto';
-import { UpdateMusicaDto } from './dto/update-musica.dto';
+import {
+  ActualizarMusicaPayloadDto,
+  IdMusicaPayloadDto,
+  IdUsuarioMusicasPayloadDto,
+} from './dto/musicas-payload.dto';
+import { MUSICAS_PATTERNS } from './musicas.patterns';
 import { MusicasService } from './musicas.service';
 
-@Controller('musicas')
+@Controller()
 export class MusicasController {
-  constructor(private readonly musicasService: MusicasService) {}
+  constructor(private readonly musicasService: MusicasService) { }
 
-  @Post()
-  create(@Body() createMusicaDto: CreateMusicaDto) {
+  @MessagePattern(MUSICAS_PATTERNS.CREAR)
+  create(@Payload() createMusicaDto: CreateMusicaDto) {
     return this.musicasService.create(createMusicaDto);
   }
 
-  @Get()
+  @MessagePattern(MUSICAS_PATTERNS.LISTAR)
   findAll() {
     return this.musicasService.findAll();
   }
 
-  @Get('usuario/:idUsuario')
-  findByUsuario(@Param('idUsuario', ParseIntPipe) idUsuario: number) {
-    return this.musicasService.findByUsuario(idUsuario);
-  }
-
-  @Get(':id')
-  findOne(@Param('id', ParseIntPipe) id: number) {
-    return this.musicasService.findOne(id);
-  }
-
-  @Patch(':id')
-  update(
-    @Param('id', ParseIntPipe) id: number,
-    @Body() updateMusicaDto: UpdateMusicaDto,
+  @MessagePattern(MUSICAS_PATTERNS.LISTAR_POR_USUARIO)
+  findByUsuario(
+    @Payload() idUsuarioPayloadDto: IdUsuarioMusicasPayloadDto,
   ) {
-    return this.musicasService.update(id, updateMusicaDto);
+    return this.musicasService.findByUsuario(
+      idUsuarioPayloadDto.IdUsuario,
+    );
   }
 
-  @Delete(':id')
-  remove(@Param('id', ParseIntPipe) id: number) {
-    return this.musicasService.remove(id);
+  @MessagePattern(MUSICAS_PATTERNS.BUSCAR_POR_ID)
+  findOne(@Payload() idMusicaPayloadDto: IdMusicaPayloadDto) {
+    return this.musicasService.findOne(
+      idMusicaPayloadDto.IdMusica,
+    );
+  }
+
+  @MessagePattern(MUSICAS_PATTERNS.ACTUALIZAR)
+  update(
+    @Payload()
+    actualizarMusicaPayloadDto: ActualizarMusicaPayloadDto,
+  ) {
+    return this.musicasService.update(
+      actualizarMusicaPayloadDto.IdMusica,
+      actualizarMusicaPayloadDto.datosMusica,
+    );
+  }
+
+  @MessagePattern(MUSICAS_PATTERNS.ELIMINAR)
+  remove(@Payload() idMusicaPayloadDto: IdMusicaPayloadDto) {
+    return this.musicasService.remove(
+      idMusicaPayloadDto.IdMusica,
+    );
   }
 }

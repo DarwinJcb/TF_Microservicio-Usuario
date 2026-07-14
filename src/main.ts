@@ -67,6 +67,7 @@ async function bootstrap(): Promise<void> {
       whitelist: true,
       forbidNonWhitelisted: true,
       transform: true,
+      validateCustomDecorators: true,
       exceptionFactory: (errores: ValidationError[]): RpcException =>
         new RpcException({
           statusCode: HttpStatus.BAD_REQUEST,

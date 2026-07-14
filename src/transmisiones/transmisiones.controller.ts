@@ -1,57 +1,72 @@
 /* src/transmisiones/transmisiones.controller.ts: */
-import {
-  Body,
-  Controller,
-  Delete,
-  Get,
-  Param,
-  ParseIntPipe,
-  Patch,
-  Post,
-} from '@nestjs/common';
+import { Controller } from '@nestjs/common';
+import { MessagePattern, Payload } from '@nestjs/microservices';
 import { CreateTransmisionDto } from './dto/create-transmision.dto';
-import { UpdateTransmisionDto } from './dto/update-transmision.dto';
+import {
+  ActualizarTransmisionPayloadDto,
+  IdTransmisionPayloadDto,
+  IdUsuarioTransmisionesPayloadDto,
+} from './dto/transmisiones-payload.dto';
+import { TRANSMISIONES_PATTERNS } from './transmisiones.patterns';
 import { TransmisionesService } from './transmisiones.service';
 
-@Controller('transmisiones')
+@Controller()
 export class TransmisionesController {
-  constructor(private readonly transmisionesService: TransmisionesService) {}
+  constructor(
+    private readonly transmisionesService: TransmisionesService,
+  ) { }
 
-  @Post()
-  create(@Body() createTransmisionDto: CreateTransmisionDto) {
+  @MessagePattern(TRANSMISIONES_PATTERNS.CREAR)
+  create(@Payload() createTransmisionDto: CreateTransmisionDto) {
     return this.transmisionesService.create(createTransmisionDto);
   }
 
-  @Get()
+  @MessagePattern(TRANSMISIONES_PATTERNS.LISTAR)
   findAll() {
     return this.transmisionesService.findAll();
   }
 
-  @Get('live')
+  @MessagePattern(TRANSMISIONES_PATTERNS.LISTAR_LIVE)
   findLive() {
     return this.transmisionesService.findLive();
   }
 
-  @Get('usuario/:idUsuario')
-  findByUsuario(@Param('idUsuario', ParseIntPipe) idUsuario: number) {
-    return this.transmisionesService.findByUsuario(idUsuario);
-  }
-
-  @Get(':id')
-  findOne(@Param('id', ParseIntPipe) id: number) {
-    return this.transmisionesService.findOne(id);
-  }
-
-  @Patch(':id')
-  update(
-    @Param('id', ParseIntPipe) id: number,
-    @Body() updateTransmisionDto: UpdateTransmisionDto,
+  @MessagePattern(TRANSMISIONES_PATTERNS.LISTAR_POR_USUARIO)
+  findByUsuario(
+    @Payload()
+    idUsuarioPayloadDto: IdUsuarioTransmisionesPayloadDto,
   ) {
-    return this.transmisionesService.update(id, updateTransmisionDto);
+    return this.transmisionesService.findByUsuario(
+      idUsuarioPayloadDto.IdUsuario,
+    );
   }
 
-  @Delete(':id')
-  remove(@Param('id', ParseIntPipe) id: number) {
-    return this.transmisionesService.remove(id);
+  @MessagePattern(TRANSMISIONES_PATTERNS.BUSCAR_POR_ID)
+  findOne(
+    @Payload() idTransmisionPayloadDto: IdTransmisionPayloadDto,
+  ) {
+    return this.transmisionesService.findOne(
+      idTransmisionPayloadDto.IdTransmision,
+    );
+  }
+
+  @MessagePattern(TRANSMISIONES_PATTERNS.ACTUALIZAR)
+  update(
+    @Payload()
+    actualizarTransmisionPayloadDto: ActualizarTransmisionPayloadDto,
+  ) {
+    return this.transmisionesService.update(
+      actualizarTransmisionPayloadDto.IdTransmision,
+      actualizarTransmisionPayloadDto.datosTransmision,
+    );
+  }
+
+  @MessagePattern(TRANSMISIONES_PATTERNS.ELIMINAR)
+  remove(
+    @Payload() idTransmisionPayloadDto: IdTransmisionPayloadDto,
+  ) {
+    return this.transmisionesService.remove(
+      idTransmisionPayloadDto.IdTransmision,
+    );
   }
 }

@@ -1,52 +1,61 @@
 /* src/intereses/intereses.controller.ts */
-import {
-  Body,
-  Controller,
-  Delete,
-  Get,
-  Param,
-  ParseIntPipe,
-  Patch,
-  Post,
-} from '@nestjs/common';
+import { Controller } from '@nestjs/common';
+import { MessagePattern, Payload } from '@nestjs/microservices';
 import { CreateInteresDto } from './dto/create-interes.dto';
-import { UpdateInteresDto } from './dto/update-interes.dto';
+import {
+  ActualizarInteresPayloadDto,
+  IdInteresPayloadDto,
+  IdUsuarioInteresesPayloadDto,
+} from './dto/intereses-payload.dto';
+import { INTERESES_PATTERNS } from './intereses.patterns';
 import { InteresesService } from './intereses.service';
 
-@Controller('intereses')
+@Controller()
 export class InteresesController {
-  constructor(private readonly interesesService: InteresesService) {}
+  constructor(private readonly interesesService: InteresesService) { }
 
-  @Post()
-  create(@Body() createInteresDto: CreateInteresDto) {
+  @MessagePattern(INTERESES_PATTERNS.CREAR)
+  create(@Payload() createInteresDto: CreateInteresDto) {
     return this.interesesService.create(createInteresDto);
   }
 
-  @Get()
+  @MessagePattern(INTERESES_PATTERNS.LISTAR)
   findAll() {
     return this.interesesService.findAll();
   }
 
-  @Get('usuario/:idUsuario')
-  findByUsuario(@Param('idUsuario', ParseIntPipe) idUsuario: number) {
-    return this.interesesService.findByUsuario(idUsuario);
-  }
-
-  @Get(':id')
-  findOne(@Param('id', ParseIntPipe) id: number) {
-    return this.interesesService.findOne(id);
-  }
-
-  @Patch(':id')
-  update(
-    @Param('id', ParseIntPipe) id: number,
-    @Body() updateInteresDto: UpdateInteresDto,
+  @MessagePattern(INTERESES_PATTERNS.BUSCAR_POR_USUARIO)
+  findByUsuario(
+    @Payload()
+    idUsuarioPayloadDto: IdUsuarioInteresesPayloadDto,
   ) {
-    return this.interesesService.update(id, updateInteresDto);
+    return this.interesesService.findByUsuario(
+      idUsuarioPayloadDto.IdUsuario,
+    );
   }
 
-  @Delete(':id')
-  remove(@Param('id', ParseIntPipe) id: number) {
-    return this.interesesService.remove(id);
+  @MessagePattern(INTERESES_PATTERNS.BUSCAR_POR_ID)
+  findOne(@Payload() idInteresPayloadDto: IdInteresPayloadDto) {
+    return this.interesesService.findOne(
+      idInteresPayloadDto.IdInteres,
+    );
+  }
+
+  @MessagePattern(INTERESES_PATTERNS.ACTUALIZAR)
+  update(
+    @Payload()
+    actualizarInteresPayloadDto: ActualizarInteresPayloadDto,
+  ) {
+    return this.interesesService.update(
+      actualizarInteresPayloadDto.IdInteres,
+      actualizarInteresPayloadDto.datosInteres,
+    );
+  }
+
+  @MessagePattern(INTERESES_PATTERNS.ELIMINAR)
+  remove(@Payload() idInteresPayloadDto: IdInteresPayloadDto) {
+    return this.interesesService.remove(
+      idInteresPayloadDto.IdInteres,
+    );
   }
 }

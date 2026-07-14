@@ -1,52 +1,67 @@
 /* src/ubicaciones/ubicaciones.controller.ts: */
-import {
-  Body,
-  Controller,
-  Delete,
-  Get,
-  Param,
-  ParseIntPipe,
-  Patch,
-  Post,
-} from '@nestjs/common';
+import { Controller } from '@nestjs/common';
+import { MessagePattern, Payload } from '@nestjs/microservices';
 import { CreateUbicacionDto } from './dto/create-ubicacion.dto';
-import { UpdateUbicacionDto } from './dto/update-ubicacion.dto';
+import {
+  ActualizarUbicacionPayloadDto,
+  IdUbicacionPayloadDto,
+  IdUsuarioUbicacionesPayloadDto,
+} from './dto/ubicaciones-payload.dto';
+import { UBICACIONES_PATTERNS } from './ubicaciones.patterns';
 import { UbicacionesService } from './ubicaciones.service';
 
-@Controller('ubicaciones')
+@Controller()
 export class UbicacionesController {
-  constructor(private readonly ubicacionesService: UbicacionesService) {}
+  constructor(
+    private readonly ubicacionesService: UbicacionesService,
+  ) { }
 
-  @Post()
-  create(@Body() createUbicacionDto: CreateUbicacionDto) {
+  @MessagePattern(UBICACIONES_PATTERNS.CREAR)
+  create(@Payload() createUbicacionDto: CreateUbicacionDto) {
     return this.ubicacionesService.create(createUbicacionDto);
   }
 
-  @Get()
+  @MessagePattern(UBICACIONES_PATTERNS.LISTAR)
   findAll() {
     return this.ubicacionesService.findAll();
   }
 
-  @Get('usuario/:idUsuario')
-  findByUsuario(@Param('idUsuario', ParseIntPipe) idUsuario: number) {
-    return this.ubicacionesService.findByUsuario(idUsuario);
-  }
-
-  @Get(':id')
-  findOne(@Param('id', ParseIntPipe) id: number) {
-    return this.ubicacionesService.findOne(id);
-  }
-
-  @Patch(':id')
-  update(
-    @Param('id', ParseIntPipe) id: number,
-    @Body() updateUbicacionDto: UpdateUbicacionDto,
+  @MessagePattern(UBICACIONES_PATTERNS.LISTAR_POR_USUARIO)
+  findByUsuario(
+    @Payload()
+    idUsuarioPayloadDto: IdUsuarioUbicacionesPayloadDto,
   ) {
-    return this.ubicacionesService.update(id, updateUbicacionDto);
+    return this.ubicacionesService.findByUsuario(
+      idUsuarioPayloadDto.IdUsuario,
+    );
   }
 
-  @Delete(':id')
-  remove(@Param('id', ParseIntPipe) id: number) {
-    return this.ubicacionesService.remove(id);
+  @MessagePattern(UBICACIONES_PATTERNS.BUSCAR_POR_ID)
+  findOne(
+    @Payload() idUbicacionPayloadDto: IdUbicacionPayloadDto,
+  ) {
+    return this.ubicacionesService.findOne(
+      idUbicacionPayloadDto.IdUbicacion,
+    );
+  }
+
+  @MessagePattern(UBICACIONES_PATTERNS.ACTUALIZAR)
+  update(
+    @Payload()
+    actualizarUbicacionPayloadDto: ActualizarUbicacionPayloadDto,
+  ) {
+    return this.ubicacionesService.update(
+      actualizarUbicacionPayloadDto.IdUbicacion,
+      actualizarUbicacionPayloadDto.datosUbicacion,
+    );
+  }
+
+  @MessagePattern(UBICACIONES_PATTERNS.ELIMINAR)
+  remove(
+    @Payload() idUbicacionPayloadDto: IdUbicacionPayloadDto,
+  ) {
+    return this.ubicacionesService.remove(
+      idUbicacionPayloadDto.IdUbicacion,
+    );
   }
 }

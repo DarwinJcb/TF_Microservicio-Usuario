@@ -1,65 +1,88 @@
 /* src/donaciones/donaciones.controller.ts: */
-import {
-  Body,
-  Controller,
-  Delete,
-  Get,
-  Param,
-  ParseIntPipe,
-  Patch,
-  Post,
-} from '@nestjs/common';
+import { Controller } from '@nestjs/common';
+import { MessagePattern, Payload } from '@nestjs/microservices';
 import { DonacionesService } from './donaciones.service';
 import { CreateDonacionDto } from './dto/create-donacion.dto';
-import { UpdateDonacionDto } from './dto/update-donacion.dto';
+import {
+  ActualizarDonacionPayloadDto,
+  IdDonacionPayloadDto,
+  IdTransmisionDonacionesPayloadDto,
+  IdUsuarioDonacionesPayloadDto,
+} from './dto/donaciones-payload.dto';
+import { DONACIONES_PATTERNS } from './donaciones.patterns';
 
-@Controller('donaciones')
+@Controller()
 export class DonacionesController {
-  constructor(private readonly donacionesService: DonacionesService) {}
+  constructor(
+    private readonly donacionesService: DonacionesService,
+  ) { }
 
-  @Post()
-  create(@Body() createDonacionDto: CreateDonacionDto) {
+  @MessagePattern(DONACIONES_PATTERNS.CREAR)
+  create(@Payload() createDonacionDto: CreateDonacionDto) {
     return this.donacionesService.create(createDonacionDto);
   }
 
-  @Get()
+  @MessagePattern(DONACIONES_PATTERNS.LISTAR)
   findAll() {
     return this.donacionesService.findAll();
   }
 
-  @Get('donante/:idUsuario')
-  findByDonante(@Param('idUsuario', ParseIntPipe) idUsuario: number) {
-    return this.donacionesService.findByDonante(idUsuario);
+  @MessagePattern(DONACIONES_PATTERNS.LISTAR_POR_DONANTE)
+  findByDonante(
+    @Payload()
+    idUsuarioPayloadDto: IdUsuarioDonacionesPayloadDto,
+  ) {
+    return this.donacionesService.findByDonante(
+      idUsuarioPayloadDto.IdUsuario,
+    );
   }
 
-  @Get('receptor/:idUsuario')
-  findByReceptor(@Param('idUsuario', ParseIntPipe) idUsuario: number) {
-    return this.donacionesService.findByReceptor(idUsuario);
+  @MessagePattern(DONACIONES_PATTERNS.LISTAR_POR_RECEPTOR)
+  findByReceptor(
+    @Payload()
+    idUsuarioPayloadDto: IdUsuarioDonacionesPayloadDto,
+  ) {
+    return this.donacionesService.findByReceptor(
+      idUsuarioPayloadDto.IdUsuario,
+    );
   }
 
-  @Get('transmision/:idTransmision')
+  @MessagePattern(DONACIONES_PATTERNS.LISTAR_POR_TRANSMISION)
   findByTransmision(
-    @Param('idTransmision', ParseIntPipe)
-    idTransmision: number,
+    @Payload()
+    idTransmisionPayloadDto: IdTransmisionDonacionesPayloadDto,
   ) {
-    return this.donacionesService.findByTransmision(idTransmision);
+    return this.donacionesService.findByTransmision(
+      idTransmisionPayloadDto.IdTransmision,
+    );
   }
 
-  @Get(':id')
-  findOne(@Param('id', ParseIntPipe) id: number) {
-    return this.donacionesService.findOne(id);
+  @MessagePattern(DONACIONES_PATTERNS.BUSCAR_POR_ID)
+  findOne(
+    @Payload() idDonacionPayloadDto: IdDonacionPayloadDto,
+  ) {
+    return this.donacionesService.findOne(
+      idDonacionPayloadDto.IdDonacion,
+    );
   }
 
-  @Patch(':id')
+  @MessagePattern(DONACIONES_PATTERNS.ACTUALIZAR)
   update(
-    @Param('id', ParseIntPipe) id: number,
-    @Body() updateDonacionDto: UpdateDonacionDto,
+    @Payload()
+    actualizarDonacionPayloadDto: ActualizarDonacionPayloadDto,
   ) {
-    return this.donacionesService.update(id, updateDonacionDto);
+    return this.donacionesService.update(
+      actualizarDonacionPayloadDto.IdDonacion,
+      actualizarDonacionPayloadDto.datosDonacion,
+    );
   }
 
-  @Delete(':id')
-  remove(@Param('id', ParseIntPipe) id: number) {
-    return this.donacionesService.remove(id);
+  @MessagePattern(DONACIONES_PATTERNS.ELIMINAR)
+  remove(
+    @Payload() idDonacionPayloadDto: IdDonacionPayloadDto,
+  ) {
+    return this.donacionesService.remove(
+      idDonacionPayloadDto.IdDonacion,
+    );
   }
 }
