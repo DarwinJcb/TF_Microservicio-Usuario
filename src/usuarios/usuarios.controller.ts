@@ -1,46 +1,50 @@
 /* src/usuarios/usuarios.controller.ts: */
-import { Controller } from '@nestjs/common';
-import { MessagePattern, Payload } from '@nestjs/microservices';
+import {
+  Body,
+  Controller,
+  Delete,
+  Get,
+  Param,
+  ParseIntPipe,
+  Patch,
+  Post,
+  UseGuards,
+} from '@nestjs/common';
+import { JwtAuthGuard } from '../auth/jwt-auth.guard';
 import { CreateUsuarioDto } from './dto/create-usuario.dto';
-import { IdUsuarioDto } from './dto/id-usuario.dto';
-import { UpdateUsuarioMensajeDto } from './dto/update-usuario-mensaje.dto';
-import { PATRONES_USUARIOS } from './patrones/usuarios.patrones';
+import { UpdateUsuarioDto } from './dto/update-usuario.dto';
 import { UsuariosService } from './usuarios.service';
 
-@Controller()
+@Controller('usuarios')
 export class UsuariosController {
   constructor(private readonly usuariosService: UsuariosService) {}
 
-  @MessagePattern(PATRONES_USUARIOS.CREAR)
-  create(@Payload() createUsuarioDto: CreateUsuarioDto) {
+  @Post()
+  create(@Body() createUsuarioDto: CreateUsuarioDto) {
     return this.usuariosService.create(createUsuarioDto);
   }
 
-  @MessagePattern(PATRONES_USUARIOS.LISTAR)
+  @Get()
+  @UseGuards(JwtAuthGuard)
   findAll() {
     return this.usuariosService.findAll();
   }
 
-  @MessagePattern(PATRONES_USUARIOS.BUSCAR)
-  findOne(@Payload() idUsuarioDto: IdUsuarioDto) {
-    return this.usuariosService.findOne(idUsuarioDto.IdUsuario);
+  @Get(':id')
+  findOne(@Param('id', ParseIntPipe) id: number) {
+    return this.usuariosService.findOne(id);
   }
 
-  @MessagePattern(PATRONES_USUARIOS.ACTUALIZAR)
+  @Patch(':id')
   update(
-    @Payload()
-    updateUsuarioDto: UpdateUsuarioMensajeDto,
+    @Param('id', ParseIntPipe) id: number,
+    @Body() updateUsuarioDto: UpdateUsuarioDto,
   ) {
-    return this.usuariosService.update(updateUsuarioDto);
+    return this.usuariosService.update(id, updateUsuarioDto);
   }
 
-  @MessagePattern(PATRONES_USUARIOS.ELIMINAR)
-  remove(@Payload() idUsuarioDto: IdUsuarioDto) {
-    return this.usuariosService.remove(idUsuarioDto.IdUsuario);
-  }
-
-  @MessagePattern(PATRONES_USUARIOS.VALIDAR_EXISTENCIA)
-  validarExistencia(@Payload() idUsuarioDto: IdUsuarioDto): Promise<boolean> {
-    return this.usuariosService.validarExistencia(idUsuarioDto.IdUsuario);
+  @Delete(':id')
+  remove(@Param('id', ParseIntPipe) id: number) {
+    return this.usuariosService.remove(id);
   }
 }

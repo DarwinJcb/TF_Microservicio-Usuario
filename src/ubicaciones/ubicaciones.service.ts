@@ -1,85 +1,78 @@
 /* src/ubicaciones/ubicaciones.service.ts: */
-import { HttpStatus, Injectable } from '@nestjs/common';
-import { RpcException } from '@nestjs/microservices';
-import { PrismaService } from '../prisma/prisma.service';
+import { Injectable, NotFoundException } from '@nestjs/common';
+import { PrismaUsuariosService } from '../prisma-usuarios/prisma-usuarios.service';
 import { CreateUbicacionDto } from './dto/create-ubicacion.dto';
-import { UpdateUbicacionMensajeDto } from './dto/update-ubicacion-mensaje.dto';
+import { UpdateUbicacionDto } from './dto/update-ubicacion.dto';
 
 @Injectable()
 export class UbicacionesService {
-  constructor(private readonly prisma: PrismaService) {}
+  constructor(private readonly prismaUsuarios: PrismaUsuariosService) {}
 
   async create(createUbicacionDto: CreateUbicacionDto) {
     await this.verificarUsuario(createUbicacionDto.UsuarioFK);
 
-    return this.prisma.ubicacion.create({
+    return this.prismaUsuarios.ubicacion.create({
       data: createUbicacionDto,
     });
   }
 
   findAll() {
-    return this.prisma.ubicacion.findMany();
+    return this.prismaUsuarios.ubicacion.findMany();
   }
 
-  async findByUsuario(IdUsuario: number) {
-    await this.verificarUsuario(IdUsuario);
+  async findByUsuario(idUsuario: number) {
+    await this.verificarUsuario(idUsuario);
 
-    return this.prisma.ubicacion.findMany({
+    return this.prismaUsuarios.ubicacion.findMany({
       where: {
-        UsuarioFK: IdUsuario,
+        UsuarioFK: idUsuario,
       },
     });
   }
 
-  async findOne(IdUbicacion: number) {
-    const ubicacion = await this.prisma.ubicacion.findUnique({
+  async findOne(id: number) {
+    const ubicacion = await this.prismaUsuarios.ubicacion.findUnique({
       where: {
-        IdUbicacion,
+        IdUbicacion: id,
       },
     });
 
     if (!ubicacion) {
-      throw new RpcException({
-        statusCode: HttpStatus.NOT_FOUND,
-        message: `No existe una ubicación con el ID ${IdUbicacion}.`,
-        error: 'Not Found',
-      });
+      throw new NotFoundException(`No existe una ubicación con el ID ${id}.`);
     }
 
     return ubicacion;
   }
 
-  async update(updateUbicacionDto: UpdateUbicacionMensajeDto) {
-    const { IdUbicacion, ...datosUbicacion } = updateUbicacionDto;
+  async update(id: number, updateUbicacionDto: UpdateUbicacionDto) {
+    await this.findOne(id);
 
-    await this.findOne(IdUbicacion);
-
-    if (datosUbicacion.UsuarioFK !== undefined) {
-      await this.verificarUsuario(datosUbicacion.UsuarioFK);
+    if (updateUbicacionDto.UsuarioFK !== undefined) {
+      await this.verificarUsuario(updateUbicacionDto.UsuarioFK);
     }
 
-    return this.prisma.ubicacion.update({
+    return this.prismaUsuarios.ubicacion.update({
       where: {
-        IdUbicacion,
+        IdUbicacion: id,
       },
-      data: datosUbicacion,
+      data: updateUbicacionDto,
     });
   }
 
-  async remove(IdUbicacion: number) {
-    await this.findOne(IdUbicacion);
+  async remove(id: number) {
+    await this.findOne(id);
 
-    return this.prisma.ubicacion.delete({
+    return this.prismaUsuarios.ubicacion.delete({
       where: {
-        IdUbicacion,
+        IdUbicacion: id,
       },
     });
   }
 
-  private async verificarUsuario(IdUsuario: number): Promise<void> {
-    const usuario = await this.prisma.usuario.findUnique({
+  private async verificarUsuario(idUsuario: number): Promise<void> {
+    const usuario = await this.prismaUsuarios.usuario.findUnique({
       where: {
-        IdUsuario,
+        IdUsuario: idUsuario,
       },
       select: {
         IdUsuario: true,
@@ -87,11 +80,9 @@ export class UbicacionesService {
     });
 
     if (!usuario) {
-      throw new RpcException({
-        statusCode: HttpStatus.NOT_FOUND,
-        message: `No existe un usuario con el ID ${IdUsuario}.`,
-        error: 'Not Found',
-      });
+      throw new NotFoundException(
+        `No existe un usuario con el ID ${idUsuario}.`,
+      );
     }
   }
 }

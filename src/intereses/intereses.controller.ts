@@ -1,47 +1,52 @@
-/* src/intereses/intereses.controller.ts: */
-import { Controller } from '@nestjs/common';
-import { MessagePattern, Payload } from '@nestjs/microservices';
-import { IdUsuarioDto } from '../usuarios/dto/id-usuario.dto';
+/* src/intereses/intereses.controller.ts */
+import {
+  Body,
+  Controller,
+  Delete,
+  Get,
+  Param,
+  ParseIntPipe,
+  Patch,
+  Post,
+} from '@nestjs/common';
 import { CreateInteresDto } from './dto/create-interes.dto';
-import { IdInteresDto } from './dto/id-interes.dto';
-import { UpdateInteresMensajeDto } from './dto/update-interes-mensaje.dto';
+import { UpdateInteresDto } from './dto/update-interes.dto';
 import { InteresesService } from './intereses.service';
-import { PATRONES_INTERESES } from './patrones/intereses.patrones';
 
-@Controller()
+@Controller('intereses')
 export class InteresesController {
   constructor(private readonly interesesService: InteresesService) {}
 
-  @MessagePattern(PATRONES_INTERESES.CREAR)
-  create(@Payload() createInteresDto: CreateInteresDto) {
+  @Post()
+  create(@Body() createInteresDto: CreateInteresDto) {
     return this.interesesService.create(createInteresDto);
   }
 
-  @MessagePattern(PATRONES_INTERESES.LISTAR)
+  @Get()
   findAll() {
     return this.interesesService.findAll();
   }
 
-  @MessagePattern(PATRONES_INTERESES.BUSCAR_POR_USUARIO)
-  findByUsuario(@Payload() idUsuarioDto: IdUsuarioDto) {
-    return this.interesesService.findByUsuario(idUsuarioDto.IdUsuario);
+  @Get('usuario/:idUsuario')
+  findByUsuario(@Param('idUsuario', ParseIntPipe) idUsuario: number) {
+    return this.interesesService.findByUsuario(idUsuario);
   }
 
-  @MessagePattern(PATRONES_INTERESES.BUSCAR)
-  findOne(@Payload() idInteresDto: IdInteresDto) {
-    return this.interesesService.findOne(idInteresDto.IdInteres);
+  @Get(':id')
+  findOne(@Param('id', ParseIntPipe) id: number) {
+    return this.interesesService.findOne(id);
   }
 
-  @MessagePattern(PATRONES_INTERESES.ACTUALIZAR)
+  @Patch(':id')
   update(
-    @Payload()
-    updateInteresDto: UpdateInteresMensajeDto,
+    @Param('id', ParseIntPipe) id: number,
+    @Body() updateInteresDto: UpdateInteresDto,
   ) {
-    return this.interesesService.update(updateInteresDto);
+    return this.interesesService.update(id, updateInteresDto);
   }
 
-  @MessagePattern(PATRONES_INTERESES.ELIMINAR)
-  remove(@Payload() idInteresDto: IdInteresDto) {
-    return this.interesesService.remove(idInteresDto.IdInteres);
+  @Delete(':id')
+  remove(@Param('id', ParseIntPipe) id: number) {
+    return this.interesesService.remove(id);
   }
 }

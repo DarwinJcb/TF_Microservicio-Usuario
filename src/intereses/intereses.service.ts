@@ -1,129 +1,114 @@
-/* src/intereses/intereses.service.ts: */
-import { HttpStatus, Injectable } from '@nestjs/common';
-import { RpcException } from '@nestjs/microservices';
-import { PrismaService } from '../prisma/prisma.service';
+/* src/intereses/intereses.service.ts */
+import {
+  ConflictException,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
+import { PrismaUsuariosService } from '../prisma-usuarios/prisma-usuarios.service';
 import { CreateInteresDto } from './dto/create-interes.dto';
-import { UpdateInteresMensajeDto } from './dto/update-interes-mensaje.dto';
+import { UpdateInteresDto } from './dto/update-interes.dto';
 
 @Injectable()
 export class InteresesService {
-  constructor(private readonly prisma: PrismaService) {}
+  constructor(private readonly prismaUsuarios: PrismaUsuariosService) {}
 
   async create(createInteresDto: CreateInteresDto) {
     await this.verificarUsuario(createInteresDto.UsuarioFK);
 
-    const interesExistente = await this.prisma.interes.findUnique({
+    const interesExistente = await this.prismaUsuarios.interes.findUnique({
       where: {
         UsuarioFK: createInteresDto.UsuarioFK,
-      },
-      select: {
-        IdInteres: true,
       },
     });
 
     if (interesExistente) {
-      throw new RpcException({
-        statusCode: HttpStatus.CONFLICT,
-        message: `El usuario con el ID ${createInteresDto.UsuarioFK} ya tiene intereses registrados.`,
-        error: 'Conflict',
-      });
+      throw new ConflictException(
+        `El usuario con el ID ${createInteresDto.UsuarioFK} ya tiene intereses registrados.`,
+      );
     }
 
-    return this.prisma.interes.create({
+    return this.prismaUsuarios.interes.create({
       data: createInteresDto,
     });
   }
 
   findAll() {
-    return this.prisma.interes.findMany();
+    return this.prismaUsuarios.interes.findMany();
   }
 
-  async findByUsuario(IdUsuario: number) {
-    await this.verificarUsuario(IdUsuario);
+  async findByUsuario(idUsuario: number) {
+    await this.verificarUsuario(idUsuario);
 
-    const interes = await this.prisma.interes.findUnique({
+    const interes = await this.prismaUsuarios.interes.findUnique({
       where: {
-        UsuarioFK: IdUsuario,
+        UsuarioFK: idUsuario,
       },
     });
 
     if (!interes) {
-      throw new RpcException({
-        statusCode: HttpStatus.NOT_FOUND,
-        message: `El usuario con el ID ${IdUsuario} no tiene intereses registrados.`,
-        error: 'Not Found',
-      });
+      throw new NotFoundException(
+        `El usuario con el ID ${idUsuario} no tiene intereses registrados.`,
+      );
     }
 
     return interes;
   }
 
-  async findOne(IdInteres: number) {
-    const interes = await this.prisma.interes.findUnique({
+  async findOne(id: number) {
+    const interes = await this.prismaUsuarios.interes.findUnique({
       where: {
-        IdInteres,
+        IdInteres: id,
       },
     });
 
     if (!interes) {
-      throw new RpcException({
-        statusCode: HttpStatus.NOT_FOUND,
-        message: `No existe un interés con el ID ${IdInteres}.`,
-        error: 'Not Found',
-      });
+      throw new NotFoundException(`No existe un interés con el ID ${id}.`);
     }
 
     return interes;
   }
 
-  async update(updateInteresDto: UpdateInteresMensajeDto) {
-    const { IdInteres, ...datosInteres } = updateInteresDto;
+  async update(id: number, updateInteresDto: UpdateInteresDto) {
+    await this.findOne(id);
 
-    await this.findOne(IdInteres);
+    if (updateInteresDto.UsuarioFK !== undefined) {
+      await this.verificarUsuario(updateInteresDto.UsuarioFK);
 
-    if (datosInteres.UsuarioFK !== undefined) {
-      await this.verificarUsuario(datosInteres.UsuarioFK);
-
-      const interesDelUsuario = await this.prisma.interes.findUnique({
+      const interesDelUsuario = await this.prismaUsuarios.interes.findUnique({
         where: {
-          UsuarioFK: datosInteres.UsuarioFK,
-        },
-        select: {
-          IdInteres: true,
+          UsuarioFK: updateInteresDto.UsuarioFK,
         },
       });
 
-      if (interesDelUsuario && interesDelUsuario.IdInteres !== IdInteres) {
-        throw new RpcException({
-          statusCode: HttpStatus.CONFLICT,
-          message: `El usuario con el ID ${datosInteres.UsuarioFK} ya tiene intereses registrados.`,
-          error: 'Conflict',
-        });
+      if (interesDelUsuario && interesDelUsuario.IdInteres !== id) {
+        throw new ConflictException(
+          `El usuario con el ID ${updateInteresDto.UsuarioFK} ya tiene intereses registrados.`,
+        );
       }
     }
 
-    return this.prisma.interes.update({
+    return this.prismaUsuarios.interes.update({
       where: {
-        IdInteres,
+        IdInteres: id,
       },
-      data: datosInteres,
+      data: updateInteresDto,
     });
   }
 
-  async remove(IdInteres: number) {
-    await this.findOne(IdInteres);
+  async remove(id: number) {
+    await this.findOne(id);
 
-    return this.prisma.interes.delete({
+    return this.prismaUsuarios.interes.delete({
       where: {
-        IdInteres,
+        IdInteres: id,
       },
     });
   }
 
-  private async verificarUsuario(IdUsuario: number): Promise<void> {
-    const usuario = await this.prisma.usuario.findUnique({
+  private async verificarUsuario(idUsuario: number): Promise<void> {
+    const usuario = await this.prismaUsuarios.usuario.findUnique({
       where: {
-        IdUsuario,
+        IdUsuario: idUsuario,
       },
       select: {
         IdUsuario: true,
@@ -131,11 +116,9 @@ export class InteresesService {
     });
 
     if (!usuario) {
-      throw new RpcException({
-        statusCode: HttpStatus.NOT_FOUND,
-        message: `No existe un usuario con el ID ${IdUsuario}.`,
-        error: 'Not Found',
-      });
+      throw new NotFoundException(
+        `No existe un usuario con el ID ${idUsuario}.`,
+      );
     }
   }
 }

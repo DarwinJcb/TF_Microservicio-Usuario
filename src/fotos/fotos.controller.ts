@@ -1,44 +1,52 @@
 /* src/fotos/fotos.controller.ts: */
-import { Controller } from '@nestjs/common';
-import { MessagePattern, Payload } from '@nestjs/microservices';
-import { IdUsuarioDto } from '../usuarios/dto/id-usuario.dto';
+import {
+  Body,
+  Controller,
+  Delete,
+  Get,
+  Param,
+  ParseIntPipe,
+  Patch,
+  Post,
+} from '@nestjs/common';
 import { CreateFotoDto } from './dto/create-foto.dto';
-import { IdFotoDto } from './dto/id-foto.dto';
-import { UpdateFotoMensajeDto } from './dto/update-foto-mensaje.dto';
+import { UpdateFotoDto } from './dto/update-foto.dto';
 import { FotosService } from './fotos.service';
-import { PATRONES_FOTOS } from './patrones/fotos.patrones';
 
-@Controller()
+@Controller('fotos')
 export class FotosController {
   constructor(private readonly fotosService: FotosService) {}
 
-  @MessagePattern(PATRONES_FOTOS.CREAR)
-  create(@Payload() createFotoDto: CreateFotoDto) {
+  @Post()
+  create(@Body() createFotoDto: CreateFotoDto) {
     return this.fotosService.create(createFotoDto);
   }
 
-  @MessagePattern(PATRONES_FOTOS.LISTAR)
+  @Get()
   findAll() {
     return this.fotosService.findAll();
   }
 
-  @MessagePattern(PATRONES_FOTOS.BUSCAR_POR_USUARIO)
-  findByUsuario(@Payload() idUsuarioDto: IdUsuarioDto) {
-    return this.fotosService.findByUsuario(idUsuarioDto.IdUsuario);
+  @Get('usuario/:idUsuario')
+  findByUsuario(@Param('idUsuario', ParseIntPipe) idUsuario: number) {
+    return this.fotosService.findByUsuario(idUsuario);
   }
 
-  @MessagePattern(PATRONES_FOTOS.BUSCAR)
-  findOne(@Payload() idFotoDto: IdFotoDto) {
-    return this.fotosService.findOne(idFotoDto.IdFoto);
+  @Get(':id')
+  findOne(@Param('id', ParseIntPipe) id: number) {
+    return this.fotosService.findOne(id);
   }
 
-  @MessagePattern(PATRONES_FOTOS.ACTUALIZAR)
-  update(@Payload() updateFotoDto: UpdateFotoMensajeDto) {
-    return this.fotosService.update(updateFotoDto);
+  @Patch(':id')
+  update(
+    @Param('id', ParseIntPipe) id: number,
+    @Body() updateFotoDto: UpdateFotoDto,
+  ) {
+    return this.fotosService.update(id, updateFotoDto);
   }
 
-  @MessagePattern(PATRONES_FOTOS.ELIMINAR)
-  remove(@Payload() idFotoDto: IdFotoDto) {
-    return this.fotosService.remove(idFotoDto.IdFoto);
+  @Delete(':id')
+  remove(@Param('id', ParseIntPipe) id: number) {
+    return this.fotosService.remove(id);
   }
 }

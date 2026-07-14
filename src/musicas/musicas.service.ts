@@ -1,13 +1,16 @@
 /* src/musicas/musicas.service.ts: */
-import { HttpStatus, Injectable } from '@nestjs/common';
-import { RpcException } from '@nestjs/microservices';
-import { PrismaService } from '../prisma/prisma.service';
+import {
+  BadRequestException,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
+import { PrismaUsuariosService } from '../prisma-usuarios/prisma-usuarios.service';
 import { CreateMusicaDto } from './dto/create-musica.dto';
-import { UpdateMusicaMensajeDto } from './dto/update-musica-mensaje.dto';
+import { UpdateMusicaDto } from './dto/update-musica.dto';
 
 @Injectable()
 export class MusicasService {
-  constructor(private readonly prisma: PrismaService) { }
+  constructor(private readonly prismaUsuarios: PrismaUsuariosService) {}
 
   async create(createMusicaDto: CreateMusicaDto) {
     await this.verificarUsuario(createMusicaDto.UsuarioFK);
@@ -17,103 +20,82 @@ export class MusicasService {
       createMusicaDto.tipoMusica,
     );
 
-    return this.prisma.musica.create({
+    return this.prismaUsuarios.musica.create({
       data: createMusicaDto,
     });
   }
 
   findAll() {
-    return this.prisma.musica.findMany();
+    return this.prismaUsuarios.musica.findMany();
   }
 
-  async findByUsuario(IdUsuario: number) {
-    await this.verificarUsuario(IdUsuario);
+  async findByUsuario(idUsuario: number) {
+    await this.verificarUsuario(idUsuario);
 
-    return this.prisma.musica.findMany({
+    return this.prismaUsuarios.musica.findMany({
       where: {
-        UsuarioFK: IdUsuario,
+        UsuarioFK: idUsuario,
       },
     });
   }
 
-  async findOne(IdMusica: number) {
-    const musica = await this.prisma.musica.findUnique({
+  async findOne(id: number) {
+    const musica = await this.prismaUsuarios.musica.findUnique({
       where: {
-        IdMusica,
+        IdMusica: id,
       },
     });
 
     if (!musica) {
-      throw new RpcException({
-        statusCode: HttpStatus.NOT_FOUND,
-        message = await this.prisma.musica.findUnique({
-          where: {
-            IdMusica,
-          },
-        });
-
-        if(!musica) {
-     : `No existe un registro musical con el ID ${IdMusica}.`,
-            error: 'Not Found',
-      });
+      throw new NotFoundException(
+        `No existe un registro musical con el ID ${id}.`,
+      );
     }
 
     return musica;
   }
 
-  async update(
-    updateMusicaDto: UpdateMusicaMensajeDto,
-  ) {
-    const { IdMusica, ...datosMusica } =
-      updateMusicaDto;
+  async update(id: number, updateMusicaDto: UpdateMusicaDto) {
+    const musicaActual = await this.findOne(id);
 
-    const musicaActual = await this.findOne(IdMusica);
-
-    if (datosMusica.UsuarioFK !== undefined) {
-      await this.verificarUsuario(
-        datosMusica.UsuarioFK,
-      );
+    if (updateMusicaDto.UsuarioFK !== undefined) {
+      await this.verificarUsuario(updateMusicaDto.UsuarioFK);
     }
 
     const nombreCancion =
-      datosMusica.nombreCancion !== undefined
-        ? datosMusica.nombreCancion
+      updateMusicaDto.nombreCancion !== undefined
+        ? updateMusicaDto.nombreCancion
         : musicaActual.nombreCancion;
 
     const tipoMusica =
-      datosMusica.tipoMusica !== undefined
-        ? datosMusica.tipoMusica
+      updateMusicaDto.tipoMusica !== undefined
+        ? updateMusicaDto.tipoMusica
         : musicaActual.tipoMusica;
 
-    this.verificarContenidoMusical(
-      nombreCancion,
-      tipoMusica,
-    );
+    this.verificarContenidoMusical(nombreCancion, tipoMusica);
 
-    return this.prisma.musica.update({
+    return this.prismaUsuarios.musica.update({
       where: {
-        IdMusica,
+        IdMusica: id,
       },
-      data: datosMusica,
+      data: updateMusicaDto,
     });
   }
 
-  async remove(IdMusica: number) {
-    await this.findOne(IdMusica);
+  async remove(id: number) {
+    await this.findOne(id);
 
-    return this.prisma.musica.delete({
+    return this.prismaUsuarios.musica.delete({
       where: {
-        IdMusica,
+        IdMusica: id,
       },
     });
   }
 
-  private async verificarUsuario(
-    IdUsuario: number,
-  ): Promise<void> {
-    const usuario = await this.prisma.usuario.findUnique({
+  private async verificarUsuario(idUsuario: number): Promise<void> {
+    const usuario = await this.prismaUsuarios.usuario.findUnique({
       where: {
-        IdUsuario,
+        IdUsuario: idUsuario,
       },
       select: {
         IdUsuario: true,
@@ -121,11 +103,9 @@ export class MusicasService {
     });
 
     if (!usuario) {
-      throw new RpcException({
-        statusCode: HttpStatus.NOT_FOUND,
-        message: `No existe un usuario con el ID ${IdUsuario}.`,
-        error: 'Not Found',
-      });
+      throw new NotFoundException(
+        `No existe un usuario con el ID ${idUsuario}.`,
+      );
     }
   }
 
@@ -133,21 +113,13 @@ export class MusicasService {
     nombreCancion?: string | null,
     tipoMusica?: string | null,
   ): void {
-    const tieneCancion = Boolean(
-      nombreCancion?.trim(),
-    );
-
-    const tieneTipoMusica = Boolean(
-      tipoMusica?.trim(),
-    );
+    const tieneCancion = Boolean(nombreCancion?.trim());
+    const tieneTipoMusica = Boolean(tipoMusica?.trim());
 
     if (!tieneCancion && !tieneTipoMusica) {
-      throw new RpcException({
-        statusCode: HttpStatus.BAD_REQUEST,
-        message:
-          'Debe ingresar el nombre de una canción o un tipo de música.',
-        error: 'Bad Request',
-      });
+      throw new BadRequestException(
+        'Debe ingresar el nombre de una canción o un tipo de música.',
+      );
     }
   }
 }

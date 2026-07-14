@@ -1,47 +1,52 @@
 /* src/ubicaciones/ubicaciones.controller.ts: */
-import { Controller } from '@nestjs/common';
-import { MessagePattern, Payload } from '@nestjs/microservices';
-import { IdUsuarioDto } from '../usuarios/dto/id-usuario.dto';
+import {
+  Body,
+  Controller,
+  Delete,
+  Get,
+  Param,
+  ParseIntPipe,
+  Patch,
+  Post,
+} from '@nestjs/common';
 import { CreateUbicacionDto } from './dto/create-ubicacion.dto';
-import { IdUbicacionDto } from './dto/id-ubicacion.dto';
-import { UpdateUbicacionMensajeDto } from './dto/update-ubicacion-mensaje.dto';
-import { PATRONES_UBICACIONES } from './patrones/ubicaciones.patrones';
+import { UpdateUbicacionDto } from './dto/update-ubicacion.dto';
 import { UbicacionesService } from './ubicaciones.service';
 
-@Controller()
+@Controller('ubicaciones')
 export class UbicacionesController {
   constructor(private readonly ubicacionesService: UbicacionesService) {}
 
-  @MessagePattern(PATRONES_UBICACIONES.CREAR)
-  create(@Payload() createUbicacionDto: CreateUbicacionDto) {
+  @Post()
+  create(@Body() createUbicacionDto: CreateUbicacionDto) {
     return this.ubicacionesService.create(createUbicacionDto);
   }
 
-  @MessagePattern(PATRONES_UBICACIONES.LISTAR)
+  @Get()
   findAll() {
     return this.ubicacionesService.findAll();
   }
 
-  @MessagePattern(PATRONES_UBICACIONES.BUSCAR_POR_USUARIO)
-  findByUsuario(@Payload() idUsuarioDto: IdUsuarioDto) {
-    return this.ubicacionesService.findByUsuario(idUsuarioDto.IdUsuario);
+  @Get('usuario/:idUsuario')
+  findByUsuario(@Param('idUsuario', ParseIntPipe) idUsuario: number) {
+    return this.ubicacionesService.findByUsuario(idUsuario);
   }
 
-  @MessagePattern(PATRONES_UBICACIONES.BUSCAR)
-  findOne(@Payload() idUbicacionDto: IdUbicacionDto) {
-    return this.ubicacionesService.findOne(idUbicacionDto.IdUbicacion);
+  @Get(':id')
+  findOne(@Param('id', ParseIntPipe) id: number) {
+    return this.ubicacionesService.findOne(id);
   }
 
-  @MessagePattern(PATRONES_UBICACIONES.ACTUALIZAR)
+  @Patch(':id')
   update(
-    @Payload()
-    updateUbicacionDto: UpdateUbicacionMensajeDto,
+    @Param('id', ParseIntPipe) id: number,
+    @Body() updateUbicacionDto: UpdateUbicacionDto,
   ) {
-    return this.ubicacionesService.update(updateUbicacionDto);
+    return this.ubicacionesService.update(id, updateUbicacionDto);
   }
 
-  @MessagePattern(PATRONES_UBICACIONES.ELIMINAR)
-  remove(@Payload() idUbicacionDto: IdUbicacionDto) {
-    return this.ubicacionesService.remove(idUbicacionDto.IdUbicacion);
+  @Delete(':id')
+  remove(@Param('id', ParseIntPipe) id: number) {
+    return this.ubicacionesService.remove(id);
   }
 }

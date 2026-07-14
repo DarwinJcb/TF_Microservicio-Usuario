@@ -1,5 +1,5 @@
 /* src/ubicaciones/dto/create-ubicacion.dto.ts: */
-import { IsInt, IsNotEmpty, IsOptional, IsString, Min } from 'class-validator';
+import { IsInt, IsNotEmpty, IsOptional, IsString } from 'class-validator';
 
 export class CreateUbicacionDto {
   @IsOptional()
@@ -15,6 +15,5 @@ export class CreateUbicacionDto {
   pais: string;
 
   @IsInt()
-  @Min(1)
   UsuarioFK: number;
 }
