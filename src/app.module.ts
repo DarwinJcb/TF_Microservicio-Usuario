@@ -25,4 +25,4 @@ import { UsuariosModule } from './usuarios/usuarios.module';
     DonacionesModule,
   ],
 })
-export class AppModule { }
+export class AppModule {}

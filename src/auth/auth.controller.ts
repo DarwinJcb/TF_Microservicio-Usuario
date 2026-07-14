@@ -8,12 +8,10 @@ import type { RespuestaLogin } from './interfaces/respuesta-login.interface';
 
 @Controller()
 export class AuthController {
-  constructor(private readonly authService: AuthService) { }
+  constructor(private readonly authService: AuthService) {}
 
   @MessagePattern(AUTH_PATTERNS.LOGIN)
-  login(
-    @Payload() loginDto: LoginDto,
-  ): Promise<RespuestaLogin> {
+  login(@Payload() loginDto: LoginDto): Promise<RespuestaLogin> {
     return this.authService.login(loginDto);
   }
 }
