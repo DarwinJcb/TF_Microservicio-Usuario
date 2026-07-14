@@ -12,9 +12,7 @@ import { UbicacionesService } from './ubicaciones.service';
 
 @Controller()
 export class UbicacionesController {
-  constructor(
-    private readonly ubicacionesService: UbicacionesService,
-  ) { }
+  constructor(private readonly ubicacionesService: UbicacionesService) {}
 
   @MessagePattern(UBICACIONES_PATTERNS.CREAR)
   create(@Payload() createUbicacionDto: CreateUbicacionDto) {
@@ -31,18 +29,12 @@ export class UbicacionesController {
     @Payload()
     idUsuarioPayloadDto: IdUsuarioUbicacionesPayloadDto,
   ) {
-    return this.ubicacionesService.findByUsuario(
-      idUsuarioPayloadDto.IdUsuario,
-    );
+    return this.ubicacionesService.findByUsuario(idUsuarioPayloadDto.IdUsuario);
   }
 
   @MessagePattern(UBICACIONES_PATTERNS.BUSCAR_POR_ID)
-  findOne(
-    @Payload() idUbicacionPayloadDto: IdUbicacionPayloadDto,
-  ) {
-    return this.ubicacionesService.findOne(
-      idUbicacionPayloadDto.IdUbicacion,
-    );
+  findOne(@Payload() idUbicacionPayloadDto: IdUbicacionPayloadDto) {
+    return this.ubicacionesService.findOne(idUbicacionPayloadDto.IdUbicacion);
   }
 
   @MessagePattern(UBICACIONES_PATTERNS.ACTUALIZAR)
@@ -57,11 +49,7 @@ export class UbicacionesController {
   }
 
   @MessagePattern(UBICACIONES_PATTERNS.ELIMINAR)
-  remove(
-    @Payload() idUbicacionPayloadDto: IdUbicacionPayloadDto,
-  ) {
-    return this.ubicacionesService.remove(
-      idUbicacionPayloadDto.IdUbicacion,
-    );
+  remove(@Payload() idUbicacionPayloadDto: IdUbicacionPayloadDto) {
+    return this.ubicacionesService.remove(idUbicacionPayloadDto.IdUbicacion);
   }
 }

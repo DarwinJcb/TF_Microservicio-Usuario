@@ -12,9 +12,7 @@ import { TransmisionesService } from './transmisiones.service';
 
 @Controller()
 export class TransmisionesController {
-  constructor(
-    private readonly transmisionesService: TransmisionesService,
-  ) { }
+  constructor(private readonly transmisionesService: TransmisionesService) {}
 
   @MessagePattern(TRANSMISIONES_PATTERNS.CREAR)
   create(@Payload() createTransmisionDto: CreateTransmisionDto) {
@@ -42,9 +40,7 @@ export class TransmisionesController {
   }
 
   @MessagePattern(TRANSMISIONES_PATTERNS.BUSCAR_POR_ID)
-  findOne(
-    @Payload() idTransmisionPayloadDto: IdTransmisionPayloadDto,
-  ) {
+  findOne(@Payload() idTransmisionPayloadDto: IdTransmisionPayloadDto) {
     return this.transmisionesService.findOne(
       idTransmisionPayloadDto.IdTransmision,
     );
@@ -62,9 +58,7 @@ export class TransmisionesController {
   }
 
   @MessagePattern(TRANSMISIONES_PATTERNS.ELIMINAR)
-  remove(
-    @Payload() idTransmisionPayloadDto: IdTransmisionPayloadDto,
-  ) {
+  remove(@Payload() idTransmisionPayloadDto: IdTransmisionPayloadDto) {
     return this.transmisionesService.remove(
       idTransmisionPayloadDto.IdTransmision,
     );

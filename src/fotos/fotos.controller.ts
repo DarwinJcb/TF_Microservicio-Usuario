@@ -12,7 +12,7 @@ import { FotosService } from './fotos.service';
 
 @Controller()
 export class FotosController {
-  constructor(private readonly fotosService: FotosService) { }
+  constructor(private readonly fotosService: FotosService) {}
 
   @MessagePattern(FOTOS_PATTERNS.CREAR)
   create(@Payload() createFotoDto: CreateFotoDto) {
@@ -25,12 +25,8 @@ export class FotosController {
   }
 
   @MessagePattern(FOTOS_PATTERNS.LISTAR_POR_USUARIO)
-  findByUsuario(
-    @Payload() idUsuarioPayloadDto: IdUsuarioFotosPayloadDto,
-  ) {
-    return this.fotosService.findByUsuario(
-      idUsuarioPayloadDto.IdUsuario,
-    );
+  findByUsuario(@Payload() idUsuarioPayloadDto: IdUsuarioFotosPayloadDto) {
+    return this.fotosService.findByUsuario(idUsuarioPayloadDto.IdUsuario);
   }
 
   @MessagePattern(FOTOS_PATTERNS.BUSCAR_POR_ID)
@@ -39,9 +35,7 @@ export class FotosController {
   }
 
   @MessagePattern(FOTOS_PATTERNS.ACTUALIZAR)
-  update(
-    @Payload() actualizarFotoPayloadDto: ActualizarFotoPayloadDto,
-  ) {
+  update(@Payload() actualizarFotoPayloadDto: ActualizarFotoPayloadDto) {
     return this.fotosService.update(
       actualizarFotoPayloadDto.IdFoto,
       actualizarFotoPayloadDto.datosFoto,

@@ -91,8 +91,7 @@ async function bootstrap(): Promise<void> {
 }
 
 bootstrap().catch((error: unknown) => {
-  const mensajeError =
-    error instanceof Error ? error.message : String(error);
+  const mensajeError = error instanceof Error ? error.message : String(error);
 
   const trazaError = error instanceof Error ? error.stack : undefined;
 

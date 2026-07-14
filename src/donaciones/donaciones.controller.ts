@@ -13,9 +13,7 @@ import { DONACIONES_PATTERNS } from './donaciones.patterns';
 
 @Controller()
 export class DonacionesController {
-  constructor(
-    private readonly donacionesService: DonacionesService,
-  ) { }
+  constructor(private readonly donacionesService: DonacionesService) {}
 
   @MessagePattern(DONACIONES_PATTERNS.CREAR)
   create(@Payload() createDonacionDto: CreateDonacionDto) {
@@ -32,9 +30,7 @@ export class DonacionesController {
     @Payload()
     idUsuarioPayloadDto: IdUsuarioDonacionesPayloadDto,
   ) {
-    return this.donacionesService.findByDonante(
-      idUsuarioPayloadDto.IdUsuario,
-    );
+    return this.donacionesService.findByDonante(idUsuarioPayloadDto.IdUsuario);
   }
 
   @MessagePattern(DONACIONES_PATTERNS.LISTAR_POR_RECEPTOR)
@@ -42,9 +38,7 @@ export class DonacionesController {
     @Payload()
     idUsuarioPayloadDto: IdUsuarioDonacionesPayloadDto,
   ) {
-    return this.donacionesService.findByReceptor(
-      idUsuarioPayloadDto.IdUsuario,
-    );
+    return this.donacionesService.findByReceptor(idUsuarioPayloadDto.IdUsuario);
   }
 
   @MessagePattern(DONACIONES_PATTERNS.LISTAR_POR_TRANSMISION)
@@ -58,12 +52,8 @@ export class DonacionesController {
   }
 
   @MessagePattern(DONACIONES_PATTERNS.BUSCAR_POR_ID)
-  findOne(
-    @Payload() idDonacionPayloadDto: IdDonacionPayloadDto,
-  ) {
-    return this.donacionesService.findOne(
-      idDonacionPayloadDto.IdDonacion,
-    );
+  findOne(@Payload() idDonacionPayloadDto: IdDonacionPayloadDto) {
+    return this.donacionesService.findOne(idDonacionPayloadDto.IdDonacion);
   }
 
   @MessagePattern(DONACIONES_PATTERNS.ACTUALIZAR)
@@ -78,11 +68,7 @@ export class DonacionesController {
   }
 
   @MessagePattern(DONACIONES_PATTERNS.ELIMINAR)
-  remove(
-    @Payload() idDonacionPayloadDto: IdDonacionPayloadDto,
-  ) {
-    return this.donacionesService.remove(
-      idDonacionPayloadDto.IdDonacion,
-    );
+  remove(@Payload() idDonacionPayloadDto: IdDonacionPayloadDto) {
+    return this.donacionesService.remove(idDonacionPayloadDto.IdDonacion);
   }
 }

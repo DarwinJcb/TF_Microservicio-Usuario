@@ -12,7 +12,7 @@ import { InteresesService } from './intereses.service';
 
 @Controller()
 export class InteresesController {
-  constructor(private readonly interesesService: InteresesService) { }
+  constructor(private readonly interesesService: InteresesService) {}
 
   @MessagePattern(INTERESES_PATTERNS.CREAR)
   create(@Payload() createInteresDto: CreateInteresDto) {
@@ -29,16 +29,12 @@ export class InteresesController {
     @Payload()
     idUsuarioPayloadDto: IdUsuarioInteresesPayloadDto,
   ) {
-    return this.interesesService.findByUsuario(
-      idUsuarioPayloadDto.IdUsuario,
-    );
+    return this.interesesService.findByUsuario(idUsuarioPayloadDto.IdUsuario);
   }
 
   @MessagePattern(INTERESES_PATTERNS.BUSCAR_POR_ID)
   findOne(@Payload() idInteresPayloadDto: IdInteresPayloadDto) {
-    return this.interesesService.findOne(
-      idInteresPayloadDto.IdInteres,
-    );
+    return this.interesesService.findOne(idInteresPayloadDto.IdInteres);
   }
 
   @MessagePattern(INTERESES_PATTERNS.ACTUALIZAR)
@@ -54,8 +50,6 @@ export class InteresesController {
 
   @MessagePattern(INTERESES_PATTERNS.ELIMINAR)
   remove(@Payload() idInteresPayloadDto: IdInteresPayloadDto) {
-    return this.interesesService.remove(
-      idInteresPayloadDto.IdInteres,
-    );
+    return this.interesesService.remove(idInteresPayloadDto.IdInteres);
   }
 }

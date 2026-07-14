@@ -1,6 +1,7 @@
 /* src/app.module.ts: */
 import { Module } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
+import { AuthModule } from './auth/auth.module';
 import { DonacionesModule } from './donaciones/donaciones.module';
 import { FotosModule } from './fotos/fotos.module';
 import { InteresesModule } from './intereses/intereses.module';
@@ -14,6 +15,7 @@ import { UsuariosModule } from './usuarios/usuarios.module';
     ConfigModule.forRoot({
       isGlobal: true,
     }),
+    AuthModule,
     UsuariosModule,
     InteresesModule,
     FotosModule,
