@@ -1,4 +1,4 @@
-/* tf_microservicio-usuarios/src/donaciones/donaciones.controller.ts: */
+/* tf_microservicio-usuarios/src/donaciones/donaciones.controller.ts */
 import { Controller } from '@nestjs/common';
 import { MessagePattern, Payload } from '@nestjs/microservices';
 import { DonacionesService } from './donaciones.service';
