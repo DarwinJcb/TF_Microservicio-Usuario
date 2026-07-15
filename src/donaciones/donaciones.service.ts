@@ -8,7 +8,7 @@ import { UpdateDonacionDto } from './dto/update-donacion.dto';
 
 @Injectable()
 export class DonacionesService {
-  constructor(private readonly prisma: PrismaService) { }
+  constructor(private readonly prisma: PrismaService) {}
 
   async create(createDonacionDto: CreateDonacionDto) {
     const { UsuarioDonanteFK, UsuarioReceptorFK, TransmisionFK } =
