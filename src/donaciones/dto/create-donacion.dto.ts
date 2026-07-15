@@ -1,5 +1,5 @@
 /* tf_microservicio-usuarios/src/donaciones/dto/create-donacion.dto.ts */
-import { IsInt, IsNumber, IsOptional, IsPositive } from 'class-validator';
+import { IsInt, IsNumber, IsOptional, IsPositive, Min } from 'class-validator';
 
 export class CreateDonacionDto {
   @IsNumber({
@@ -9,12 +9,15 @@ export class CreateDonacionDto {
   monto: number;
 
   @IsInt()
+  @Min(1)
   UsuarioDonanteFK: number;
 
   @IsInt()
+  @Min(1)
   UsuarioReceptorFK: number;
 
   @IsOptional()
   @IsInt()
-  TransmisionFK?: number;
+  @Min(1)
+  TransmisionFK?: number | null;
 }
